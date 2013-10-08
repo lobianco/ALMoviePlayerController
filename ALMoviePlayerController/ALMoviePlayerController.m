@@ -223,7 +223,6 @@ static const NSTimeInterval fullscreenAnimationDuration = 0.3;
     
     //remote file
     if (![self.contentURL.scheme isEqualToString:@"file"] && self.loadState == MPMovieLoadStateUnknown) {
-        NSLog(@"yes");
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(videoLoadStateChanged:) name:MPMoviePlayerLoadStateDidChangeNotification object:nil];
         [self performSelector:@selector(movieTimedOut) withObject:nil afterDelay:20.f];
     }

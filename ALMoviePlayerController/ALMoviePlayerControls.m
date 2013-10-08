@@ -499,9 +499,7 @@ static const CGFloat activityIndicatorSize = 40.f;
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-    
-    NSLog(@"layout");
-        
+            
     if (self.style == ALMoviePlayerControlsStyleNone)
         return;
     
