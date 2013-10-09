@@ -43,6 +43,11 @@ static const NSTimeInterval fullscreenAnimationDuration = 0.3;
     return [self initWithFrame:CGRectZero];
 }
 
+- (id)initWithContentURL:(NSURL *)url {
+    [[NSException exceptionWithName:@"ALMoviePlayerController Error" reason:@"Set contentURL after initialization." userInfo:nil] raise];
+    return nil;
+}
+
 - (id)initWithFrame:(CGRect)frame {
     if ( (self = [super init]) ) {
         
@@ -75,13 +80,18 @@ static const NSTimeInterval fullscreenAnimationDuration = 0.3;
 # pragma mark - Setters
 
 - (void)setContentURL:(NSURL *)contentURL {
+    if (!_controls) {
+        [[NSException exceptionWithName:@"ALMoviePlayerController Error" reason:@"Set contentURL after setting controls." userInfo:nil] raise];
+    }
     [super setContentURL:contentURL];
     [[NSNotificationCenter defaultCenter] postNotificationName:ALMoviePlayerContentURLDidChangeNotification object:nil];
+    [self play];
 }
 
 - (void)setControls:(ALMoviePlayerControls *)controls {
     if (_controls != controls) {
         _controls = controls;
+        _controls.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
         [self.view addSubview:_controls];
     }
 }
@@ -212,8 +222,10 @@ static const NSTimeInterval fullscreenAnimationDuration = 0.3;
     
     //remote file
     if (![self.contentURL.scheme isEqualToString:@"file"] && self.loadState == MPMovieLoadStateUnknown) {
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:MPMoviePlayerLoadStateDidChangeNotification object:nil];
+        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(movieTimedOut) object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(videoLoadStateChanged:) name:MPMoviePlayerLoadStateDidChangeNotification object:nil];
-        [self performSelector:@selector(movieTimedOut) withObject:nil afterDelay:20.f];
+        [self performSelector:@selector(movieTimedOut) withObject:nil afterDelay:4.f];
     }
 }
 

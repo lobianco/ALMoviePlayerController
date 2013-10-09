@@ -41,7 +41,6 @@
     self.moviePlayer = [[ALMoviePlayerController alloc] init];
     self.moviePlayer.view.alpha = 0.f;
     self.moviePlayer.delegate = self; //IMPORTANT!
-    [self.moviePlayer setShouldAutoplay:NO];
     
     ALMoviePlayerControls *movieControls = [[ALMoviePlayerControls alloc] initWithMoviePlayer:self.moviePlayer style:ALMoviePlayerControlsStyleDefault];
     //[movieControls setTimeRemainingDecrements:YES];

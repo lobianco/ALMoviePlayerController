@@ -82,6 +82,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         _timeRemainingDecrements = NO;
         _barColor = [UIColor blackColor];
         _seekRate = 3.f;
+        _state = ALMoviePlayerControlsStateIdle;
         
         [self setup];
         [self addNotifications];
@@ -432,7 +433,6 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
             break;
         case MPMovieLoadStateStalled:
         case MPMovieLoadStateUnknown:
-            self.state = ALMoviePlayerControlsStateLoading;
             break;
         default:
             break;
@@ -473,9 +473,10 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 }
 
 - (void)movieContentURLDidChange:(NSNotification *)note {
-    [self hideControls:nil];
-    //don't show loading indicator for local files
-    self.state = [self.moviePlayer.contentURL.scheme isEqualToString:@"file"] ? ALMoviePlayerControlsStateReady : ALMoviePlayerControlsStateLoading;
+    [self hideControls:^{
+        //don't show loading indicator for local files
+        self.state = [self.moviePlayer.contentURL.scheme isEqualToString:@"file"] ? ALMoviePlayerControlsStateReady : ALMoviePlayerControlsStateLoading;
+    }];
 }
 
 # pragma mark - Internal Methods
@@ -521,6 +522,9 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
             if (completion)
                 completion();
         }];
+    } else {
+        if (completion)
+            completion();
     }
 }
 

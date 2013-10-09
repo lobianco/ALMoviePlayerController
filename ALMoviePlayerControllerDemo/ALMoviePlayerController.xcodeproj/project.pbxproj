@@ -494,7 +494,7 @@
 				INFOPLIST_FILE = "ALMoviePlayerController/ALMoviePlayerController-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "664F58F1-D6AB-4ABA-9FA8-BE43975354A0";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -511,7 +511,7 @@
 				INFOPLIST_FILE = "ALMoviePlayerController/ALMoviePlayerController-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "664F58F1-D6AB-4ABA-9FA8-BE43975354A0";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
