@@ -7,6 +7,7 @@
 //
 
 #import "ALMoviePlayerControls.h"
+#import "ALMoviePlayerController.h"
 #import "ALAirplayView.h"
 #import "ALButton.h"
 #import <tgmath.h>
@@ -25,10 +26,10 @@ static const CGFloat activityIndicatorSize = 40.f;
     int windowSubviews;
 }
 
+@property (nonatomic, weak) ALMoviePlayerController *moviePlayer;
 @property (nonatomic, assign) ALMoviePlayerControlsState state;
 @property (nonatomic, getter = isShowing) BOOL showing;
 
-@property (nonatomic, weak) ALMoviePlayerController *moviePlayer;
 @property (nonatomic, strong) NSTimer *durationTimer;
 
 @property (nonatomic, strong) UIView *activityBackgroundView;
@@ -57,6 +58,7 @@ static const CGFloat activityIndicatorSize = 40.f;
         
         _moviePlayer = moviePlayer;
         _style = style;
+        _showing = NO;
         
         [self setup];
         [self addNotifications];
@@ -127,7 +129,15 @@ static const CGFloat activityIndicatorSize = 40.f;
     [_playPauseButton addTarget:self action:@selector(playPausePressed:) forControlEvents:UIControlEventTouchUpInside];
     _playPauseButton.delegate = self;
     
-    if (_style == ALMoviePlayerControlsStyleFullscreen) {
+    _airplayView = [[ALAirplayView alloc] init];
+    _airplayView.delegate = self;
+    
+    _fullscreenButton = [[ALButton alloc] init];
+    [_fullscreenButton setImage:[UIImage imageNamed:@"movieFullscreen.png"] forState:UIControlStateNormal];
+    [_fullscreenButton addTarget:self action:@selector(fullscreenPressed:) forControlEvents:UIControlEventTouchUpInside];
+    _fullscreenButton.delegate = self;
+    
+    if (_style == ALMoviePlayerControlsStyleFullscreen || (_style == ALMoviePlayerControlsStyleDefault && _moviePlayer.isFullscreen)) {
         [_topBar addSubview:_durationSlider];
         [_topBar addSubview:_timeElapsedLabel];
         [_topBar addSubview:_timeRemainingLabel];
@@ -137,26 +147,22 @@ static const CGFloat activityIndicatorSize = 40.f;
         [_volumeView setShowsRouteButton:NO];
         [_volumeView setShowsVolumeSlider:YES];
         [_bottomBar addSubview:_volumeView];
+        
+        [_bottomBar addSubview:_airplayView];
+        [_bottomBar addSubview:_fullscreenButton];
     }
     
-    else if (_style == ALMoviePlayerControlsStyleEmbedded) {
+    else if (_style == ALMoviePlayerControlsStyleEmbedded || (_style == ALMoviePlayerControlsStyleDefault && !_moviePlayer.isFullscreen)) {
         [_bottomBar addSubview:_playPauseButton];
         [_bottomBar addSubview:_durationSlider];
         [_bottomBar addSubview:_timeElapsedLabel];
         [_bottomBar addSubview:_timeRemainingLabel];
+        
+        [_bottomBar addSubview:_airplayView];
+        [_bottomBar addSubview:_fullscreenButton];
     }
     
     //static stuff
-    _airplayView = [[ALAirplayView alloc] init];
-    _airplayView.delegate = self;
-    [_bottomBar addSubview:_airplayView];
-    
-    _fullscreenButton = [[ALButton alloc] init];
-    [_fullscreenButton setImage:[UIImage imageNamed:@"movieFullscreen.png"] forState:UIControlStateNormal];
-    [_fullscreenButton addTarget:self action:@selector(fullscreenPressed:) forControlEvents:UIControlEventTouchUpInside];
-    _fullscreenButton.delegate = self;
-    [_bottomBar addSubview:_fullscreenButton];
-    
     _activityBackgroundView = [[UIView alloc] init];
     [_activityBackgroundView setBackgroundColor:[UIColor blackColor]];
     _activityBackgroundView.alpha = 0.f;
@@ -178,19 +184,23 @@ static const CGFloat activityIndicatorSize = 40.f;
 # pragma mark - Setters
 
 - (void)setStyle:(ALMoviePlayerControlsStyle)style {
+    BOOL flag = _style == ALMoviePlayerControlsStyleDefault;
     if (_style != style) {
         _style = style;
         
-        [self hideControls:^(BOOL finished) {
+        [self hideControls:^{
             [self resetViews];
             [self setup];
-            double delayInSeconds = 0.3;
+            double delayInSeconds = 0.2;
             dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
             dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
                 [self setDurationSliderMaxMinValues];
                 [self monitorMoviePlayback]; //resume values
                 [self startDurationTimer];
                 [self showControls];
+                if (flag) {
+                    _style = ALMoviePlayerControlsStyleDefault;
+                }
             });
         }];
     }
@@ -204,27 +214,14 @@ static const CGFloat activityIndicatorSize = 40.f;
             case ALMoviePlayerControlsStateLoading:
                 [self showLoadingIndicators];
                 break;
-                
             case ALMoviePlayerControlsStateReady:
                 [self hideLoadingIndicators];
                 break;
-                
             case ALMoviePlayerControlsStateIdle:
             default:
                 break;
         }
     }
-}
-
-# pragma mark - Getters
-
-- (BOOL)isShowing {
-    if (self.style == ALMoviePlayerControlsStyleFullscreen)
-        return (self.topBar.alpha == 1.f);
-    else if (self.style == ALMoviePlayerControlsStyleEmbedded)
-        return (self.bottomBar.alpha == 1.f);
-    
-    return NO;
 }
 
 # pragma mark - UIControl/Touch Events
@@ -237,7 +234,6 @@ static const CGFloat activityIndicatorSize = 40.f;
 - (void)durationSliderTouchEnded:(UISlider *)slider {
     [self.moviePlayer setCurrentPlaybackTime:floor(slider.value)];
     [self.moviePlayer play];
-    
     [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
 }
 
@@ -296,17 +292,16 @@ static const CGFloat activityIndicatorSize = 40.f;
 }
 
 - (void)playPausePressed:(UIButton *)button {
-    if (self.moviePlayer.playbackState == MPMoviePlaybackStatePlaying) {
-        [self.moviePlayer pause];
-    }
-    else {
-        [self.moviePlayer play];
-    }
+    self.moviePlayer.playbackState == MPMoviePlaybackStatePlaying ? [self.moviePlayer pause] : [self.moviePlayer play];
     [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
 }
 
 - (void)fullscreenPressed:(UIButton *)button {
+    if (self.style == ALMoviePlayerControlsStyleDefault) {
+        self.style = self.moviePlayer.isFullscreen ? ALMoviePlayerControlsStyleEmbedded : ALMoviePlayerControlsStyleFullscreen;
+    }
     [self.moviePlayer setFullscreen:!self.moviePlayer.isFullscreen animated:YES];
+    [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
@@ -317,7 +312,6 @@ static const CGFloat activityIndicatorSize = 40.f;
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
     if (self.style == ALMoviePlayerControlsStyleNone)
         return;
-    
     self.isShowing ? [self hideControls:nil] : [self showControls];
 }
 
@@ -327,12 +321,8 @@ static const CGFloat activityIndicatorSize = 40.f;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(moviePlaybackStateDidChange:) name:MPMoviePlayerPlaybackStateDidChangeNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(movieFinished:) name:MPMoviePlayerPlaybackDidFinishNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(movieContentURLDidChange:) name:ALMoviePlayerContentURLDidChangeNotification object:nil];
-    
-    //remote file
-    if (![_moviePlayer.contentURL.scheme isEqualToString:@"file"]) {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(movieDurationAvailable:) name:MPMovieDurationAvailableNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(movieLoadStateDidChange:) name:MPMoviePlayerLoadStateDidChangeNotification object:nil];
-    }
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(movieDurationAvailable:) name:MPMovieDurationAvailableNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(movieLoadStateDidChange:) name:MPMoviePlayerLoadStateDidChangeNotification object:nil];
 }
 
 - (void)movieFinished:(NSNotification *)note {
@@ -340,7 +330,6 @@ static const CGFloat activityIndicatorSize = 40.f;
     [self.durationTimer invalidate];
     [self.moviePlayer setCurrentPlaybackTime:0.0];
     [self monitorMoviePlayback]; //reset values
-    
     self.state = ALMoviePlayerControlsStateIdle;
 }
 
@@ -351,12 +340,10 @@ static const CGFloat activityIndicatorSize = 40.f;
         case MPMovieLoadStatePlaythroughOK:
             self.state = ALMoviePlayerControlsStateReady;
             break;
-            
         case MPMovieLoadStateStalled:
         case MPMovieLoadStateUnknown:
             self.state = ALMoviePlayerControlsStateLoading;
             break;
-            
         default:
             break;
     }
@@ -373,23 +360,19 @@ static const CGFloat activityIndicatorSize = 40.f;
                 [self setDurationSliderMaxMinValues];
                 [self showControls];
             }
-            
         case MPMoviePlaybackStateSeekingBackward:
         case MPMoviePlaybackStateSeekingForward:
             self.state = ALMoviePlayerControlsStateReady;
             break;
-            
         case MPMoviePlaybackStateInterrupted:
             self.state = ALMoviePlayerControlsStateLoading;
             break;
-            
         case MPMoviePlaybackStatePaused:
         case MPMoviePlaybackStateStopped:
             self.state = ALMoviePlayerControlsStateIdle;
             self.playPauseButton.selected = YES;
             [self stopDurationTimer];
             break;
-            
         default:
             break;
     }
@@ -401,13 +384,8 @@ static const CGFloat activityIndicatorSize = 40.f;
 
 - (void)movieContentURLDidChange:(NSNotification *)note {
     [self hideControls:nil];
-    
-    if ([self.moviePlayer.contentURL.scheme isEqualToString:@"file"]) {
-        //don't show loading indicator for local files
-        self.state = ALMoviePlayerControlsStateReady;
-    } else {
-        self.state = ALMoviePlayerControlsStateLoading;
-    }
+    //don't show loading indicator for local files
+    self.state = [self.moviePlayer.contentURL.scheme isEqualToString:@"file"] ? ALMoviePlayerControlsStateReady : ALMoviePlayerControlsStateLoading;
 }
 
 # pragma mark - Internal Methods
@@ -422,28 +400,38 @@ static const CGFloat activityIndicatorSize = 40.f;
 }
 
 - (void)showControls {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hideControls:) object:nil];
-    [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionCurveLinear|UIViewAnimationOptionBeginFromCurrentState animations:^{
-        if (self.style == ALMoviePlayerControlsStyleFullscreen) {
-            self.topBar.alpha = 1.f;
+    if (!self.isShowing) {
+        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hideControls:) object:nil];
+        if (self.style == ALMoviePlayerControlsStyleFullscreen || (self.style == ALMoviePlayerControlsStyleDefault && self.moviePlayer.isFullscreen)) {
+            [self.topBar setNeedsDisplay];
         }
-        self.bottomBar.alpha = 1.f;
-    } completion:^(BOOL finished) {
-        [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
-    }];
+        [self.bottomBar setNeedsDisplay];
+        [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionCurveLinear|UIViewAnimationOptionBeginFromCurrentState animations:^{
+            if (self.style == ALMoviePlayerControlsStyleFullscreen || (self.style == ALMoviePlayerControlsStyleDefault && self.moviePlayer.isFullscreen)) {
+                self.topBar.alpha = 1.f;
+            }
+            self.bottomBar.alpha = 1.f;
+        } completion:^(BOOL finished) {
+            _showing = YES;
+            [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
+        }];
+    }
 }
 
-- (void)hideControls:(void(^)(BOOL finished))completion {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hideControls:) object:nil];
-    [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionCurveLinear|UIViewAnimationOptionBeginFromCurrentState animations:^{
-        if (self.style == ALMoviePlayerControlsStyleFullscreen) {
-            self.topBar.alpha = 0.f;
-        }
-        self.bottomBar.alpha = 0.f;
-    } completion:^(BOOL finished) {
-        if (completion)
-            completion(YES);
-    }];
+- (void)hideControls:(void(^)(void))completion {
+    if (self.isShowing) {
+        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hideControls:) object:nil];
+        [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionCurveLinear|UIViewAnimationOptionBeginFromCurrentState animations:^{
+            if (self.style == ALMoviePlayerControlsStyleFullscreen || (self.style == ALMoviePlayerControlsStyleDefault && self.moviePlayer.isFullscreen)) {
+                self.topBar.alpha = 0.f;
+            }
+            self.bottomBar.alpha = 0.f;
+        } completion:^(BOOL finished) {
+            _showing = NO;
+            if (completion)
+                completion();
+        }];
+    }
 }
 
 - (void)showLoadingIndicators {
@@ -505,7 +493,7 @@ static const CGFloat activityIndicatorSize = 40.f;
     
     //common sizes
     CGFloat paddingFromBezel = self.frame.size.width <= 320.f ? 10.f : 30.f;
-    CGFloat paddingBetweenButtons = self.frame.size.width <= 320.f ? 10.f : 20.f;
+    CGFloat paddingBetweenButtons = self.frame.size.width <= 320.f ? 10.f : 30.f;
     CGFloat paddingBetweenLabelsAndSlider = 10.f;
     CGFloat barHeight = 50.f;
     CGFloat sliderHeight = 34.f; //default height
@@ -515,7 +503,7 @@ static const CGFloat activityIndicatorSize = 40.f;
     CGFloat fullscreenHeight = fullscreenWidth;
     CGFloat labelWidth = 40.f;
     
-    if (self.style == ALMoviePlayerControlsStyleFullscreen) {
+    if (self.style == ALMoviePlayerControlsStyleFullscreen || (self.style == ALMoviePlayerControlsStyleDefault && self.moviePlayer.isFullscreen)) {
         //top bar
         self.topBar.frame = CGRectMake(0, 0, self.frame.size.width, barHeight);
         self.timeElapsedLabel.frame = CGRectMake(paddingFromBezel, 0, labelWidth, barHeight);
@@ -526,10 +514,10 @@ static const CGFloat activityIndicatorSize = 40.f;
         self.playPauseButton.frame = CGRectMake(self.bottomBar.frame.size.width/2 - 9.f, barHeight/2 - 11.f, 18.f, 22.f);
         self.volumeView.frame = CGRectMake(paddingFromBezel, barHeight/2 - 10.f, 160.f, 20.f);
         self.fullscreenButton.frame = CGRectMake(self.bottomBar.frame.size.width - paddingFromBezel - fullscreenWidth, barHeight/2 - fullscreenHeight/2, fullscreenWidth, fullscreenHeight);
-        self.airplayView.frame = CGRectMake(self.fullscreenButton.frame.origin.x - 20.f - airplayWidth, barHeight/2 - airplayHeight/2, airplayWidth, airplayHeight);
+        self.airplayView.frame = CGRectMake(self.fullscreenButton.frame.origin.x - paddingBetweenButtons - airplayWidth, barHeight/2 - airplayHeight/2, airplayWidth, airplayHeight);
     }
     
-    else if (self.style == ALMoviePlayerControlsStyleEmbedded) {
+    else if (self.style == ALMoviePlayerControlsStyleEmbedded || (self.style == ALMoviePlayerControlsStyleDefault && !self.moviePlayer.isFullscreen)) {
         self.bottomBar.frame = CGRectMake(0, self.frame.size.height - barHeight, self.frame.size.width, barHeight);
         
         //left side of bottom bar
@@ -543,7 +531,6 @@ static const CGFloat activityIndicatorSize = 40.f;
     }
     
     //duration slider
-    
     CGFloat timeRemainingX = self.timeRemainingLabel.frame.origin.x;
     CGFloat timeElapsedX = self.timeElapsedLabel.frame.origin.x;
     CGFloat sliderWidth = ((timeRemainingX - paddingBetweenLabelsAndSlider) - (timeElapsedX + self.timeElapsedLabel.frame.size.width + paddingBetweenLabelsAndSlider));

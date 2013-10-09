@@ -34,22 +34,32 @@
     self.view.backgroundColor = [UIColor darkGrayColor];
     
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Local File" style:UIBarButtonItemStyleBordered target:self action:@selector(localFile)];
+    self.navigationItem.leftBarButtonItem.enabled = NO;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Remote File" style:UIBarButtonItemStyleBordered target:self action:@selector(remoteFile)];
+    self.navigationItem.rightBarButtonItem.enabled = NO;
     
     self.moviePlayer = [[ALMoviePlayerController alloc] init];
     self.moviePlayer.view.alpha = 0.f;
     self.moviePlayer.delegate = self; //IMPORTANT!
     [self.moviePlayer setShouldAutoplay:NO];
+    
+    ALMoviePlayerControls *movieControls = [[ALMoviePlayerControls alloc] initWithMoviePlayer:self.moviePlayer style:ALMoviePlayerControlsStyleDefault];
+    //[movieControls setTimeRemainingDecrements:YES];
+    
+    [self.moviePlayer setControls:movieControls];
     [self.view addSubview:self.moviePlayer.view];
     
     //delay initial load so statusBarOrientation returns correct value
-    double delayInSeconds = 0.5;
+    double delayInSeconds = 0.3;
     dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
     dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
         [self configureViewForOrientation:[UIApplication sharedApplication].statusBarOrientation];
         [UIView animateWithDuration:0.3 delay:0.0 options:0 animations:^{
             self.moviePlayer.view.alpha = 1.f;
-        } completion:nil];
+        } completion:^(BOOL finished) {
+            self.navigationItem.leftBarButtonItem.enabled = YES;
+            self.navigationItem.rightBarButtonItem.enabled = YES;
+        }];
     });
 }
 
@@ -75,6 +85,7 @@
     [self.moviePlayer setFrame:self.defaultFrame];
 }
 
+//these files are in the public domain and no longer have property rights
 - (void)localFile {
     [self.moviePlayer stop];
     [self.moviePlayer setContentURL:[NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"popeye" ofType:@"mp4"]]];

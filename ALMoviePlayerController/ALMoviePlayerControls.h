@@ -8,9 +8,11 @@
 
 #import <UIKit/UIKit.h>
 #import <MediaPlayer/MPMoviePlayerController.h>
-#import "ALMoviePlayerController.h"
+
+@class ALMoviePlayerController;
 
 typedef enum {
+    ALMoviePlayerControlsStyleDefault,
     ALMoviePlayerControlsStyleEmbedded,
     ALMoviePlayerControlsStyleFullscreen,
     ALMoviePlayerControlsStyleNone,

@@ -7,6 +7,7 @@
 //
 
 #import <MediaPlayer/MPMoviePlayerController.h>
+#import "ALMoviePlayerControls.h"
 
 static NSString * const ALMoviePlayerContentURLDidChangeNotification = @"ALMoviePlayerContentURLDidChangeNotification";
 
@@ -23,5 +24,6 @@ static NSString * const ALMoviePlayerContentURLDidChangeNotification = @"ALMovie
 - (id)initWithFrame:(CGRect)frame;
 
 @property (nonatomic, weak) id<ALMoviePlayerControllerDelegate> delegate;
+@property (nonatomic, strong) ALMoviePlayerControls *controls;
 
 @end

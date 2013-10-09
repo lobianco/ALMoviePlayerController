@@ -7,11 +7,10 @@
 //
 
 #import "ALMoviePlayerController.h"
-#import "ALMoviePlayerControls.h"
 
 # pragma mark - Helper Categories
 
-@implementation UIApplication (AppDimensions)
+@implementation UIApplication (ALAppDimensions)
 + (CGSize)sizeInOrientation:(UIInterfaceOrientation)orientation {
     CGSize size = [UIScreen mainScreen].bounds.size;
     UIApplication *application = [UIApplication sharedApplication];
@@ -33,7 +32,7 @@ static const NSTimeInterval fullscreenAnimationDuration = 0.3;
 
 @property (nonatomic, strong) UIView *movieBackgroundView;
 @property (nonatomic, readwrite) BOOL movieFullscreen; //used to manipulate default fullscreen property
-@property (nonatomic, strong) ALMoviePlayerControls *movieControls;
+
 
 @end
 
@@ -48,9 +47,9 @@ static const NSTimeInterval fullscreenAnimationDuration = 0.3;
 - (id)initWithFrame:(CGRect)frame {
     if ( (self = [super init]) ) {
         
-        [self setFrame:frame];
-        [self setControlStyle:MPMovieControlStyleNone];
+        self.view.frame = frame;
         self.view.backgroundColor = [UIColor blackColor];
+        [self setControlStyle:MPMovieControlStyleNone];
         
         _movieFullscreen = NO;
         
@@ -81,9 +80,16 @@ static const NSTimeInterval fullscreenAnimationDuration = 0.3;
     [[NSNotificationCenter defaultCenter] postNotificationName:ALMoviePlayerContentURLDidChangeNotification object:nil];
 }
 
+- (void)setControls:(ALMoviePlayerControls *)controls {
+    if (_controls != controls) {
+        _controls = controls;
+        [self.view addSubview:_controls];
+    }
+}
+
 - (void)setFrame:(CGRect)frame {
     [self.view setFrame:frame];
-    [self.movieControls setFrame:CGRectMake(0, 0, frame.size.width, frame.size.height)];
+    [self.controls setFrame:CGRectMake(0, 0, frame.size.width, frame.size.height)];
 }
 
 - (void)setFullscreen:(BOOL)fullscreen {
@@ -94,9 +100,6 @@ static const NSTimeInterval fullscreenAnimationDuration = 0.3;
     _movieFullscreen = fullscreen;
     if (fullscreen) {
         [[NSNotificationCenter defaultCenter] postNotificationName:MPMoviePlayerWillEnterFullscreenNotification object:nil];
-        
-        [self.movieControls setStyle:ALMoviePlayerControlsStyleFullscreen];
-
         UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
         if (!keyWindow) {
             keyWindow = [[[UIApplication sharedApplication] windows] objectAtIndex:0];
@@ -123,9 +126,6 @@ static const NSTimeInterval fullscreenAnimationDuration = 0.3;
     } else {
         [[NSNotificationCenter defaultCenter] postNotificationName:MPMoviePlayerWillExitFullscreenNotification object:nil];
         [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillChangeStatusBarOrientationNotification object:nil];
-        
-        [self.movieControls setStyle:ALMoviePlayerControlsStyleEmbedded];
-
         [UIView animateWithDuration:animated ? fullscreenAnimationDuration : 0.0 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
             self.view.alpha = 0.f;
         } completion:^(BOOL finished) {
@@ -210,15 +210,6 @@ static const NSTimeInterval fullscreenAnimationDuration = 0.3;
 # pragma mark - Internal Methods
 
 - (void)play {
-    if (!_movieControls) {
-        _movieControls = [[ALMoviePlayerControls alloc] initWithMoviePlayer:self style:ALMoviePlayerControlsStyleEmbedded];
-        _movieControls.frame = (CGRect){.origin=CGPointZero, .size=self.view.frame.size};
-        [self.view addSubview:_movieControls];
-        
-        //give it a little nudge to setup its subviews
-        [[NSNotificationCenter defaultCenter] postNotificationName:ALMoviePlayerContentURLDidChangeNotification object:nil];
-    }
-    
     [super play];
     
     //remote file
