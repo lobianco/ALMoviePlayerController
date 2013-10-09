@@ -386,12 +386,18 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     self.moviePlayer.currentPlaybackRate = !button.selected ? self.seekRate : 1.f;
     button.selected = !button.selected;
     self.seekBackwardButton.selected = NO;
+    if (!button.selected) {
+        [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
+    }
 }
 
 - (void)seekBackwardPressed:(UIButton *)button {
     self.moviePlayer.currentPlaybackRate = !button.selected ? -self.seekRate : 1.f;
     button.selected = !button.selected;
     self.seekForwardButton.selected = NO;
+    if (!button.selected) {
+        [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
+    }
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
