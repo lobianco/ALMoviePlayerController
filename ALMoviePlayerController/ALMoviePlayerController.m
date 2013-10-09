@@ -8,8 +8,6 @@
 
 #import "ALMoviePlayerController.h"
 
-# pragma mark - Helper Categories
-
 @implementation UIApplication (ALAppDimensions)
 + (CGSize)sizeInOrientation:(UIInterfaceOrientation)orientation {
     CGSize size = [UIScreen mainScreen].bounds.size;

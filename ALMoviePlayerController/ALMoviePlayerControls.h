@@ -37,7 +37,3 @@ typedef enum {
 - (id)initWithMoviePlayer:(ALMoviePlayerController *)moviePlayer style:(ALMoviePlayerControlsStyle)style;
 
 @end
-
-@interface ALMoviePlayerControlsBar : UIView
-@property (nonatomic, strong) UIColor *color;
-@end

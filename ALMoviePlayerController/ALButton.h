@@ -10,9 +10,9 @@
 
 @protocol ALButtonDelegate <NSObject>
 @optional
-- (void)buttonTouchedDown;
-- (void)buttonTouchedUpOutside;
-- (void)buttonTouchCancelled;
+- (void)buttonTouchedDown:(UIButton *)button;
+- (void)buttonTouchedUpOutside:(UIButton *)button;
+- (void)buttonTouchCancelled:(UIButton *)button;
 @end
 
 @interface ALButton : UIButton

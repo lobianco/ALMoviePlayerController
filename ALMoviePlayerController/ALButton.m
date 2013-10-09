@@ -14,7 +14,6 @@ static const CGFloat expandedMargin = 10.f;
 
 - (id)init {
     if ( self = [super init] ) {
-        self.adjustsImageWhenHighlighted = YES;
         self.showsTouchWhenHighlighted = YES;
         [self addTarget:self action:@selector(touchedDown:) forControlEvents:UIControlEventTouchDown];
         [self addTarget:self action:@selector(touchedUpOutside:) forControlEvents:UIControlEventTouchUpOutside];
@@ -24,20 +23,20 @@ static const CGFloat expandedMargin = 10.f;
 }
 
 - (void)touchedDown:(UIButton *)button {
-    if ([self.delegate respondsToSelector:@selector(buttonTouchedDown)]) {
-        [self.delegate buttonTouchedDown];
+    if ([self.delegate respondsToSelector:@selector(buttonTouchedDown:)]) {
+        [self.delegate buttonTouchedDown:self];
     }
 }
 
 - (void)touchedUpOutside:(UIButton *)button {
-    if ([self.delegate respondsToSelector:@selector(buttonTouchedUpOutside)]) {
-        [self.delegate buttonTouchedUpOutside];
+    if ([self.delegate respondsToSelector:@selector(buttonTouchedUpOutside:)]) {
+        [self.delegate buttonTouchedUpOutside:self];
     }
 }
 
 - (void)touchCancelled:(UIButton *)button {
-    if ([self.delegate respondsToSelector:@selector(buttonTouchCancelled)]) {
-        [self.delegate buttonTouchCancelled];
+    if ([self.delegate respondsToSelector:@selector(buttonTouchCancelled:)]) {
+        [self.delegate buttonTouchCancelled:self];
     }
 }
 
