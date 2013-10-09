@@ -17,5 +17,7 @@
 @end
 
 @interface ALAirplayView : MPVolumeView
+
 @property (nonatomic, weak) id<ALAirplayViewDelegate> delegate;
+
 @end

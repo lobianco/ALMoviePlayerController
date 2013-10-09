@@ -92,9 +92,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_durationTimer invalidate];
-    _airplayView.delegate = nil;
-    _playPauseButton.delegate = nil;
-    _fullscreenButton.delegate = nil;
+    [self nilDelegates];
 }
 
 # pragma mark - Construct/Destruct Helpers
@@ -205,11 +203,17 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 
 - (void)resetViews {
     [self stopDurationTimer];
-    _fullscreenButton.delegate = nil;
-    _airplayView.delegate = nil;
-    _playPauseButton.delegate = nil;
+    [self nilDelegates];
     [_topBar removeFromSuperview];
     [_bottomBar removeFromSuperview];
+}
+
+- (void)nilDelegates {
+    _airplayView.delegate = nil;
+    _playPauseButton.delegate = nil;
+    _fullscreenButton.delegate = nil;
+    _seekForwardButton.delegate = nil;
+    _seekBackwardButton.delegate = nil;
 }
 
 # pragma mark - Setters

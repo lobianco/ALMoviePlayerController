@@ -9,6 +9,7 @@
 #import "ALMoviePlayerController.h"
 
 @implementation UIApplication (ALAppDimensions)
+
 + (CGSize)sizeInOrientation:(UIInterfaceOrientation)orientation {
     CGSize size = [UIScreen mainScreen].bounds.size;
     UIApplication *application = [UIApplication sharedApplication];
@@ -20,6 +21,7 @@
     }
     return size;
 }
+
 @end
 
 static const CGFloat movieBackgroundPadding = 20.f; //if we don't pad the movie's background view, the edges will appear jagged when rotating
