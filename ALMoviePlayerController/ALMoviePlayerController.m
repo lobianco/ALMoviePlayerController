@@ -24,7 +24,7 @@
 }
 @end
 
-static const CGFloat movieBackgroundPadding = 20.f; //if we don't pad the movie's background view, then the edges will appear jagged when rotating
+static const CGFloat movieBackgroundPadding = 20.f; //if we don't pad the movie's background view, the edges will appear jagged when rotating
 static const CGFloat statusBarHeight = 20.f;
 static const NSTimeInterval fullscreenAnimationDuration = 0.3;
 
@@ -32,7 +32,6 @@ static const NSTimeInterval fullscreenAnimationDuration = 0.3;
 
 @property (nonatomic, strong) UIView *movieBackgroundView;
 @property (nonatomic, readwrite) BOOL movieFullscreen; //used to manipulate default fullscreen property
-
 
 @end
 
@@ -106,7 +105,6 @@ static const NSTimeInterval fullscreenAnimationDuration = 0.3;
         }
         [self.movieBackgroundView setFrame:CGRectMake(-movieBackgroundPadding, -movieBackgroundPadding, keyWindow.bounds.size.width + movieBackgroundPadding*2, keyWindow.bounds.size.height + movieBackgroundPadding*2)];
         [keyWindow addSubview:self.movieBackgroundView];
-        
         [UIView animateWithDuration:animated ? fullscreenAnimationDuration : 0.0 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
             self.movieBackgroundView.alpha = 1.f;
         } completion:^(BOOL finished) {

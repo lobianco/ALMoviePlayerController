@@ -45,6 +45,8 @@
     
     ALMoviePlayerControls *movieControls = [[ALMoviePlayerControls alloc] initWithMoviePlayer:self.moviePlayer style:ALMoviePlayerControlsStyleDefault];
     //[movieControls setTimeRemainingDecrements:YES];
+    //[movieControls setFadeDelay:2.0];
+    //[movieControls setBarColor:[UIColor redColor]];
     
     [self.moviePlayer setControls:movieControls];
     [self.view addSubview:self.moviePlayer.view];

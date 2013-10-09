@@ -59,6 +59,9 @@ static const CGFloat activityIndicatorSize = 40.f;
         _moviePlayer = moviePlayer;
         _style = style;
         _showing = NO;
+        _fadeDelay = 5.0;
+        _timeRemainingDecrements = NO;
+        _barColor = [UIColor blackColor];
         
         [self setup];
         [self addNotifications];
@@ -79,17 +82,16 @@ static const CGFloat activityIndicatorSize = 40.f;
 - (void)setup {
     if (self.style == ALMoviePlayerControlsStyleNone)
         return;
-    
-    _fadeDelay = 5.0;
-    _timeRemainingDecrements = NO;
-    
+
     //top bar
     _topBar = [[ALMoviePlayerControlsBar alloc] init];
+    _topBar.color = _barColor;
     _topBar.alpha = 0.f;
     [self addSubview:_topBar];
     
     //bottom bar
     _bottomBar = [[ALMoviePlayerControlsBar alloc] init];
+    _bottomBar.color = _barColor;
     _bottomBar.alpha = 0.f;
     [self addSubview:_bottomBar];
     
@@ -221,6 +223,14 @@ static const CGFloat activityIndicatorSize = 40.f;
             default:
                 break;
         }
+    }
+}
+
+- (void)setBarColor:(UIColor *)barColor {
+    if (_barColor != barColor) {
+        _barColor = barColor;
+        [self.topBar setColor:barColor];
+        [self.bottomBar setColor:barColor];
     }
 }
 
@@ -553,9 +563,16 @@ static const CGFloat activityIndicatorSize = 40.f;
     return self;
 }
 
+- (void)setColor:(UIColor *)color {
+    if (_color != color) {
+        _color = color;
+        [self setNeedsDisplay];
+    }
+}
+
 - (void)drawRect:(CGRect)rect {
     CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextSetFillColorWithColor(context, [UIColor colorWithWhite:0.0 alpha:0.5].CGColor);
+    CGContextSetFillColorWithColor(context, [_color colorWithAlphaComponent:0.5].CGColor);
     CGContextFillRect(context, rect);
 }
 

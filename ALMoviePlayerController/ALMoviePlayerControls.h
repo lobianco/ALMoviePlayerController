@@ -28,6 +28,7 @@ typedef enum {
 
 @property (nonatomic, assign) ALMoviePlayerControlsStyle style;
 @property (nonatomic, readonly) ALMoviePlayerControlsState state;
+@property (nonatomic, strong) UIColor *barColor;
 @property (nonatomic, assign) NSTimeInterval fadeDelay;
 @property (nonatomic) BOOL timeRemainingDecrements;
 @property (nonatomic, readonly, getter = isShowing) BOOL showing;
@@ -37,5 +38,5 @@ typedef enum {
 @end
 
 @interface ALMoviePlayerControlsBar : UIView
-
+@property (nonatomic, strong) UIColor *color;
 @end
