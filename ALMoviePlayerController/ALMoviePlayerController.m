@@ -44,7 +44,7 @@ static const NSTimeInterval fullscreenAnimationDuration = 0.3;
 }
 
 - (id)initWithContentURL:(NSURL *)url {
-    [[NSException exceptionWithName:@"ALMoviePlayerController Error" reason:@"Set contentURL after initialization." userInfo:nil] raise];
+    [[NSException exceptionWithName:@"ALMoviePlayerController Exception" reason:@"Set contentURL after initialization." userInfo:nil] raise];
     return nil;
 }
 
@@ -81,7 +81,7 @@ static const NSTimeInterval fullscreenAnimationDuration = 0.3;
 
 - (void)setContentURL:(NSURL *)contentURL {
     if (!_controls) {
-        [[NSException exceptionWithName:@"ALMoviePlayerController Error" reason:@"Set contentURL after setting controls." userInfo:nil] raise];
+        [[NSException exceptionWithName:@"ALMoviePlayerController Exception" reason:@"Set contentURL after setting controls." userInfo:nil] raise];
     }
     [super setContentURL:contentURL];
     [[NSNotificationCenter defaultCenter] postNotificationName:ALMoviePlayerContentURLDidChangeNotification object:nil];
