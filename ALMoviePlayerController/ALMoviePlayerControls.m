@@ -503,8 +503,6 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
             self.bottomBar.alpha = 1.f;
         } completion:^(BOOL finished) {
             _showing = YES;
-            NSLog(@"%@", NSStringFromCGRect(self.topBar.frame));
-            NSLog(@"%@", NSStringFromCGRect(self.bottomBar.frame));
             [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
         }];
     }
