@@ -44,6 +44,8 @@ static const CGFloat activityIndicatorSize = 40.f;
 @property (nonatomic, strong) ALButton *fullscreenButton;
 @property (nonatomic, strong) UILabel *timeElapsedLabel;
 @property (nonatomic, strong) UILabel *timeRemainingLabel;
+@property (nonatomic, strong) ALButton *seekForwardButton;
+@property (nonatomic, strong) ALButton *seekBackwardButton;
 
 @end
 
@@ -62,6 +64,7 @@ static const CGFloat activityIndicatorSize = 40.f;
         _fadeDelay = 5.0;
         _timeRemainingDecrements = NO;
         _barColor = [UIColor blackColor];
+        _seekRate = 3.f;
         
         [self setup];
         [self addNotifications];
@@ -125,46 +128,55 @@ static const CGFloat activityIndicatorSize = 40.f;
     _timeRemainingLabel.layer.shadowOffset = CGSizeMake(1.f, 1.f);
     _timeRemainingLabel.layer.shadowOpacity = 0.8f;
     
-    _playPauseButton = [[ALButton alloc] init];
-    [_playPauseButton setImage:[UIImage imageNamed:@"moviePause.png"] forState:UIControlStateNormal];
-    [_playPauseButton setImage:[UIImage imageNamed:@"moviePlay.png"] forState:UIControlStateSelected];
-    [_playPauseButton addTarget:self action:@selector(playPausePressed:) forControlEvents:UIControlEventTouchUpInside];
-    _playPauseButton.delegate = self;
-    
-    _airplayView = [[ALAirplayView alloc] init];
-    _airplayView.delegate = self;
-    
-    _fullscreenButton = [[ALButton alloc] init];
-    [_fullscreenButton setImage:[UIImage imageNamed:@"movieFullscreen.png"] forState:UIControlStateNormal];
-    [_fullscreenButton addTarget:self action:@selector(fullscreenPressed:) forControlEvents:UIControlEventTouchUpInside];
-    _fullscreenButton.delegate = self;
-    
     if (_style == ALMoviePlayerControlsStyleFullscreen || (_style == ALMoviePlayerControlsStyleDefault && _moviePlayer.isFullscreen)) {
         [_topBar addSubview:_durationSlider];
         [_topBar addSubview:_timeElapsedLabel];
         [_topBar addSubview:_timeRemainingLabel];
-        [_bottomBar addSubview:_playPauseButton];
         
         _volumeView = [[MPVolumeView alloc] init];
         [_volumeView setShowsRouteButton:NO];
         [_volumeView setShowsVolumeSlider:YES];
         [_bottomBar addSubview:_volumeView];
         
-        [_bottomBar addSubview:_airplayView];
-        [_bottomBar addSubview:_fullscreenButton];
+        _seekForwardButton = [[ALButton alloc] init];
+        [_seekForwardButton setImage:[UIImage imageNamed:@"movieForward.png"] forState:UIControlStateNormal];
+        [_seekForwardButton setImage:[UIImage imageNamed:@"movieForwardSelected.png"] forState:UIControlStateSelected];
+        _seekForwardButton.delegate = self;
+        [_seekForwardButton addTarget:self action:@selector(seekForwardPressed:) forControlEvents:UIControlEventTouchUpInside];
+        [_bottomBar addSubview:_seekForwardButton];
+        
+        _seekBackwardButton = [[ALButton alloc] init];
+        [_seekBackwardButton setImage:[UIImage imageNamed:@"movieBackward.png"] forState:UIControlStateNormal];
+        [_seekBackwardButton setImage:[UIImage imageNamed:@"movieBackwardSelected.png"] forState:UIControlStateSelected];
+        _seekBackwardButton.delegate = self;
+        [_seekBackwardButton addTarget:self action:@selector(seekBackwardPressed:) forControlEvents:UIControlEventTouchUpInside];
+        [_bottomBar addSubview:_seekBackwardButton];
     }
     
     else if (_style == ALMoviePlayerControlsStyleEmbedded || (_style == ALMoviePlayerControlsStyleDefault && !_moviePlayer.isFullscreen)) {
-        [_bottomBar addSubview:_playPauseButton];
         [_bottomBar addSubview:_durationSlider];
         [_bottomBar addSubview:_timeElapsedLabel];
         [_bottomBar addSubview:_timeRemainingLabel];
-        
-        [_bottomBar addSubview:_airplayView];
-        [_bottomBar addSubview:_fullscreenButton];
     }
     
     //static stuff
+    _playPauseButton = [[ALButton alloc] init];
+    [_playPauseButton setImage:[UIImage imageNamed:@"moviePause.png"] forState:UIControlStateNormal];
+    [_playPauseButton setImage:[UIImage imageNamed:@"moviePlay.png"] forState:UIControlStateSelected];
+    [_playPauseButton addTarget:self action:@selector(playPausePressed:) forControlEvents:UIControlEventTouchUpInside];
+    _playPauseButton.delegate = self;
+    [_bottomBar addSubview:_playPauseButton];
+    
+    _airplayView = [[ALAirplayView alloc] init];
+    _airplayView.delegate = self;
+    [_bottomBar addSubview:_airplayView];
+    
+    _fullscreenButton = [[ALButton alloc] init];
+    [_fullscreenButton setImage:[UIImage imageNamed:@"movieFullscreen.png"] forState:UIControlStateNormal];
+    [_fullscreenButton addTarget:self action:@selector(fullscreenPressed:) forControlEvents:UIControlEventTouchUpInside];
+    _fullscreenButton.delegate = self;
+    [_bottomBar addSubview:_fullscreenButton];
+    
     _activityBackgroundView = [[UIView alloc] init];
     [_activityBackgroundView setBackgroundColor:[UIColor blackColor]];
     _activityBackgroundView.alpha = 0.f;
@@ -314,6 +326,16 @@ static const CGFloat activityIndicatorSize = 40.f;
     [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
 }
 
+- (void)seekForwardPressed:(UIButton *)button {
+    self.moviePlayer.currentPlaybackRate = !button.selected ? self.seekRate : 1.f;
+    button.selected = !button.selected;
+}
+
+- (void)seekBackwardPressed:(UIButton *)button {
+    self.moviePlayer.currentPlaybackRate = !button.selected ? -self.seekRate : 1.f;
+    button.selected = !button.selected;
+}
+
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     if (self.style == ALMoviePlayerControlsStyleNone)
         return;
@@ -340,6 +362,7 @@ static const CGFloat activityIndicatorSize = 40.f;
     [self.durationTimer invalidate];
     [self.moviePlayer setCurrentPlaybackTime:0.0];
     [self monitorMoviePlayback]; //reset values
+    [self hideControls:nil];
     self.state = ALMoviePlayerControlsStateIdle;
 }
 
@@ -504,9 +527,12 @@ static const CGFloat activityIndicatorSize = 40.f;
     //common sizes
     CGFloat paddingFromBezel = self.frame.size.width <= 320.f ? 10.f : 30.f;
     CGFloat paddingBetweenButtons = self.frame.size.width <= 320.f ? 10.f : 30.f;
+    CGFloat paddingBetweenPlaybackButtons = 30.f;
     CGFloat paddingBetweenLabelsAndSlider = 10.f;
     CGFloat barHeight = 50.f;
     CGFloat sliderHeight = 34.f; //default height
+    CGFloat seekWidth = 36.f;
+    CGFloat seekHeight = 20.f;
     CGFloat airplayWidth = 30.f;
     CGFloat airplayHeight = 22.f;
     CGFloat fullscreenWidth = 28.f;
@@ -522,6 +548,9 @@ static const CGFloat activityIndicatorSize = 40.f;
         //bottom bar
         self.bottomBar.frame = CGRectMake(0, self.frame.size.height - barHeight, self.frame.size.width, barHeight);
         self.playPauseButton.frame = CGRectMake(self.bottomBar.frame.size.width/2 - 9.f, barHeight/2 - 11.f, 18.f, 22.f);
+        self.seekForwardButton.frame = CGRectMake(self.playPauseButton.frame.origin.x + self.playPauseButton.frame.size.width + paddingBetweenPlaybackButtons, barHeight/2 - seekHeight/2, seekWidth, seekHeight);
+        self.seekBackwardButton.frame = CGRectMake(self.playPauseButton.frame.origin.x - paddingBetweenPlaybackButtons - seekWidth, barHeight/2 - seekHeight/2, seekWidth, seekHeight);
+        
         self.volumeView.frame = CGRectMake(paddingFromBezel, barHeight/2 - 10.f, 160.f, 20.f);
         self.fullscreenButton.frame = CGRectMake(self.bottomBar.frame.size.width - paddingFromBezel - fullscreenWidth, barHeight/2 - fullscreenHeight/2, fullscreenWidth, fullscreenHeight);
         self.airplayView.frame = CGRectMake(self.fullscreenButton.frame.origin.x - paddingBetweenButtons - airplayWidth, barHeight/2 - airplayHeight/2, airplayWidth, airplayHeight);

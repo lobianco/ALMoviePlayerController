@@ -8,6 +8,8 @@
 
 #import "ALButton.h"
 
+static const CGFloat expandedMargin = 10.f;
+
 @implementation ALButton
 
 - (id)init {
@@ -39,13 +41,9 @@
     }
 }
 
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect
-{
-    // Drawing code
+- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
+    CGRect expandedFrame = CGRectMake(0 - expandedMargin , 0 - expandedMargin , self.frame.size.width + (expandedMargin * 2) , self.frame.size.height + (expandedMargin * 2));
+    return (CGRectContainsPoint(expandedFrame, point) == 1) ? self : nil;
 }
-*/
 
 @end

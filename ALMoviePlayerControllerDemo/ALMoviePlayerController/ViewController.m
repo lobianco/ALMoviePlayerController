@@ -47,6 +47,7 @@
     //[movieControls setTimeRemainingDecrements:YES];
     //[movieControls setFadeDelay:2.0];
     //[movieControls setBarColor:[UIColor redColor]];
+    //[movieControls setSeekRate:2.f];
     
     [self.moviePlayer setControls:movieControls];
     [self.view addSubview:self.moviePlayer.view];

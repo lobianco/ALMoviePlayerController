@@ -30,6 +30,7 @@ typedef enum {
 @property (nonatomic, readonly) ALMoviePlayerControlsState state;
 @property (nonatomic, strong) UIColor *barColor;
 @property (nonatomic, assign) NSTimeInterval fadeDelay;
+@property (nonatomic, assign) float seekRate;
 @property (nonatomic) BOOL timeRemainingDecrements;
 @property (nonatomic, readonly, getter = isShowing) BOOL showing;
 
