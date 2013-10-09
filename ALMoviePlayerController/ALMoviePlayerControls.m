@@ -346,8 +346,8 @@ static const CGFloat activityIndicatorSize = 40.f;
 - (void)movieLoadStateDidChange:(NSNotification *)note {
     switch (self.moviePlayer.loadState) {
         case MPMovieLoadStatePlayable:
-            [self showControls];
         case MPMovieLoadStatePlaythroughOK:
+            [self showControls];
             self.state = ALMoviePlayerControlsStateReady;
             break;
         case MPMovieLoadStateStalled:
