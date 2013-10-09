@@ -179,6 +179,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     _playPauseButton = [[ALButton alloc] init];
     [_playPauseButton setImage:[UIImage imageNamed:@"moviePause.png"] forState:UIControlStateNormal];
     [_playPauseButton setImage:[UIImage imageNamed:@"moviePlay.png"] forState:UIControlStateSelected];
+    [_playPauseButton setSelected:YES];
     [_playPauseButton addTarget:self action:@selector(playPausePressed:) forControlEvents:UIControlEventTouchUpInside];
     _playPauseButton.delegate = self;
     [_bottomBar addSubview:_playPauseButton];
@@ -599,7 +600,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     CGFloat barHeight = 50.f;
     CGFloat sliderHeight = 34.f; //default height
     CGFloat volumeHeight = 20.f;
-    CGFloat volumeWidth = 120.f;
+    CGFloat volumeWidth = isIpad() ? 210.f : 120.f;
     CGFloat seekWidth = 36.f;
     CGFloat seekHeight = 20.f;
     CGFloat airplayWidth = 30.f;
