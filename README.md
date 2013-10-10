@@ -47,16 +47,20 @@ The process is as follows:
 1. Create an ```ALMoviePlayerController``` movie player and assign yourself as its delegate
 2. Create the ```ALMoviePlayerControls``` controls (and optionally customize)
 3. Assign the controls to the movie player
-4. Set the movie player's ```contentURL```, and play the movie
+4. Set the movie player's ```contentURL```, which will start playing the movie
 5. On device rotation, adjust movie player frame if it's not in fullscreen (when in fullscreen, rotation is handled automatically)
 6. Implement ```ALMoviePlayerController``` delegate methods 
 
 **In code:**
 
 ```objc
+@property (nonatomic, strong) ALMoviePlayerController *moviePlayer;
+
+//...
+
 // create a movie player
-ALMoviePlayerController *moviePlayer = [[ALMoviePlayerController alloc] initWithFrame:self.view.frame];
-moviePlayer.delegate = self; //IMPORTANT!
+self.moviePlayer = [[ALMoviePlayerController alloc] initWithFrame:self.view.frame];
+self.moviePlayer.delegate = self; //IMPORTANT!
     
 // create the controls
 ALMoviePlayerControls *movieControls = [[ALMoviePlayerControls alloc] initWithMoviePlayer:moviePlayer
@@ -72,13 +76,13 @@ ALMoviePlayerControls *movieControls = [[ALMoviePlayerControls alloc] initWithMo
  */
     
 // assign the controls to the movie player
-[moviePlayer setControls:movieControls];
+[self.moviePlayer setControls:movieControls];
 
 // add movie player to your view
-[self.view addSubview:moviePlayer.view];
+[self.view addSubview:self.moviePlayer.view];
     
-//set contentURL
-[moviePlayer setContentURL:[NSURL URLWithString:@"http://archive.org/download/WaltDisneyCartoons-MickeyMouseMinnieMouseDonaldDuckGoofyAndPluto/WaltDisneyCartoons-MickeyMouseMinnieMouseDonaldDuckGoofyAndPluto-HawaiianHoliday1937-Video.mp4"]];
+//set contentURL (this will automatically start playing the movie)
+[self.moviePlayer setContentURL:[NSURL URLWithString:@"http://archive.org/download/WaltDisneyCartoons-MickeyMouseMinnieMouseDonaldDuckGoofyAndPluto/WaltDisneyCartoons-MickeyMouseMinnieMouseDonaldDuckGoofyAndPluto-HawaiianHoliday1937-Video.mp4"]];
 ```
 
 **On rotation:**
@@ -109,10 +113,12 @@ if (!self.moviePlayer.isFullscreen) {
 Your code might look something like this:
 
 ```objc
-if (![self.view.subviews containsObject:self.moviePlayer.view])
-    [self.view addSubview:self.moviePlayer.view];
+- (void)moviePlayerWillMoveFromWindow {
+    if (![self.view.subviews containsObject:self.moviePlayer.view])
+        [self.view addSubview:self.moviePlayer.view];
     
-[self.moviePlayer setFrame:frame];
+    [self.moviePlayer setFrame:frame];
+}
 ```
 
 ### Controls Properties
