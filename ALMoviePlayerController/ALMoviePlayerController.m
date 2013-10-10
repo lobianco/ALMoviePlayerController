@@ -90,7 +90,6 @@ static const NSTimeInterval fullscreenAnimationDuration = 0.3;
 }
 
 - (CGFloat)statusBarHeightInOrientation:(UIInterfaceOrientation)orientation {
-    //NSLog(@"%@", NSStringFromCGRect([UIApplication sharedApplication].statusBarFrame));
     if ([UIDevice iOSVersion] >= 7.0)
         return 0.f;
     else if ([UIApplication sharedApplication].statusBarHidden)

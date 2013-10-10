@@ -82,7 +82,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         _timeRemainingDecrements = NO;
         _barColor = [UIColor blackColor];
         
-        //in fullscreen mode, move controls away from bottom screen bezel. I think the iOS7 control center gestures interfere with the uibutton touch events. this will alleviate that a little (correct me if I'm wrong and/or adjust if necessary).
+        //in fullscreen mode, move controls away from top status bar and bottom screen bezel. I think the iOS7 control center gestures interfere with the uibutton touch events. this will alleviate that a little (correct me if I'm wrong and/or adjust if necessary).
         _barHeight = [UIDevice iOSVersion] >= 7.0 ? 70.f : 50.f;
         
         _seekRate = 3.f;
@@ -225,25 +225,33 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 # pragma mark - Setters
 
 - (void)setStyle:(ALMoviePlayerControlsStyle)style {
-    BOOL flag = _style == ALMoviePlayerControlsStyleDefault;
     if (_style != style) {
-        _style = style;
-        
+        BOOL flag = _style == ALMoviePlayerControlsStyleDefault;
         [self hideControls:^{
             [self resetViews];
+            _style = style;
             [self setup];
-            double delayInSeconds = 0.2;
-            dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-            dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-                [self setDurationSliderMaxMinValues];
-                [self monitorMoviePlayback]; //resume values
-                [self startDurationTimer];
-                [self showControls];
+            if (_style != ALMoviePlayerControlsStyleNone) {
+                double delayInSeconds = 0.2;
+                dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+                dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+                    [self setDurationSliderMaxMinValues];
+                    [self monitorMoviePlayback]; //resume values
+                    [self startDurationTimer];
+                    [self showControls:^{
+                        if (flag) {
+                            //put style back to default
+                            _style = ALMoviePlayerControlsStyleDefault;
+                        }
+                    }];
+                    
+                });
+            } else {
                 if (flag) {
                     //put style back to default
                     _style = ALMoviePlayerControlsStyleDefault;
                 }
-            });
+            }
         }];
     }
 }
@@ -413,7 +421,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
     if (self.style == ALMoviePlayerControlsStyleNone)
         return;
-    self.isShowing ? [self hideControls:nil] : [self showControls];
+    self.isShowing ? [self hideControls:nil] : [self showControls:nil];
 }
 
 # pragma mark - Notifications
@@ -439,7 +447,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     switch (self.moviePlayer.loadState) {
         case MPMovieLoadStatePlayable:
         case MPMovieLoadStatePlaythroughOK:
-            [self showControls];
+            [self showControls:nil];
             self.state = ALMoviePlayerControlsStateReady;
             break;
         case MPMovieLoadStateStalled:
@@ -459,7 +467,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
             //local file
             if ([self.moviePlayer.contentURL.scheme isEqualToString:@"file"]) {
                 [self setDurationSliderMaxMinValues];
-                [self showControls];
+                [self showControls:nil];
             }
         case MPMoviePlaybackStateSeekingBackward:
         case MPMoviePlaybackStateSeekingForward:
@@ -501,7 +509,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     [self.durationTimer invalidate];
 }
 
-- (void)showControls {
+- (void)showControls:(void(^)(void))completion {
     if (!self.isShowing) {
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hideControls:) object:nil];
         if (self.style == ALMoviePlayerControlsStyleFullscreen || (self.style == ALMoviePlayerControlsStyleDefault && self.moviePlayer.isFullscreen)) {
@@ -515,8 +523,13 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
             self.bottomBar.alpha = 1.f;
         } completion:^(BOOL finished) {
             _showing = YES;
+            if (completion)
+                completion();
             [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
         }];
+    } else {
+        if (completion)
+            completion();
     }
 }
 
