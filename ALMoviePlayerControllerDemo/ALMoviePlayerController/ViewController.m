@@ -39,13 +39,14 @@
     self.navigationItem.rightBarButtonItem.enabled = NO;
     
     //create a player
-    self.moviePlayer = [[ALMoviePlayerController alloc] init];
+    self.moviePlayer = [[ALMoviePlayerController alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
     self.moviePlayer.view.alpha = 0.f;
     self.moviePlayer.delegate = self; //IMPORTANT!
     
     //create the controls
-    ALMoviePlayerControls *movieControls = [[ALMoviePlayerControls alloc] initWithMoviePlayer:self.moviePlayer style:ALMoviePlayerControlsStyleEmbedded];
-    [movieControls setBarColor:[UIColor colorWithRed:195/255.0 green:29/255.0 blue:29/255.0 alpha:0.5]];
+    ALMoviePlayerControls *movieControls = [[ALMoviePlayerControls alloc] initWithMoviePlayer:self.moviePlayer style:ALMoviePlayerControlsStyleDefault];
+    //[movieControls setAdjustsFullscreenImage:NO];
+    //[movieControls setBarColor:[UIColor colorWithRed:195/255.0 green:29/255.0 blue:29/255.0 alpha:0.5]];
     //[movieControls setTimeRemainingDecrements:YES];
     //[movieControls setFadeDelay:2.0];
     //[movieControls setBarHeight:100.f];

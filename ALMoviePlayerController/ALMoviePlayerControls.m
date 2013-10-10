@@ -78,6 +78,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         _moviePlayer = moviePlayer;
         _style = style;
         _showing = NO;
+        _adjustsFullscreenImage = YES;
         _fadeDelay = 5.0;
         _timeRemainingDecrements = NO;
         _barColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
@@ -194,7 +195,11 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     
     _fullscreenButton = [[ALButton alloc] init];
     [_fullscreenButton setImage:[UIImage imageNamed:@"movieFullscreen.png"] forState:UIControlStateNormal];
+    [_fullscreenButton setImage:[UIImage imageNamed:@"movieEndFullscreen.png"] forState:UIControlStateSelected];
     [_fullscreenButton addTarget:self action:@selector(fullscreenPressed:) forControlEvents:UIControlEventTouchUpInside];
+    if (_adjustsFullscreenImage) {
+        _fullscreenButton.selected = _moviePlayer.isFullscreen ? YES : NO;
+    }
     _fullscreenButton.delegate = self;
     [_bottomBar addSubview:_fullscreenButton];
     
@@ -391,6 +396,9 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     if (self.style == ALMoviePlayerControlsStyleDefault) {
         self.style = self.moviePlayer.isFullscreen ? ALMoviePlayerControlsStyleEmbedded : ALMoviePlayerControlsStyleFullscreen;
     }
+    if (self.adjustsFullscreenImage) {
+        button.selected = !button.selected;
+    }
     if (self.moviePlayer.currentPlaybackRate != 1.f) {
         self.moviePlayer.currentPlaybackRate = 1.f;
     }
@@ -567,7 +575,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 }
 
 - (void)hideLoadingIndicators {
-    [UIView animateWithDuration:0.2f delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
+    [UIView animateWithDuration:0.2f delay:0.0 options:0 animations:^{
         self.activityBackgroundView.alpha = 0.0f;
         self.activityIndicator.alpha = 0.f;
     } completion:^(BOOL finished) {

@@ -15,6 +15,8 @@
 		20F694D11805176800DEDB45 /* movieBackwardSelected@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 20F694CD1805176800DEDB45 /* movieBackwardSelected@2x.png */; };
 		20F694D21805176800DEDB45 /* movieForwardSelected.png in Resources */ = {isa = PBXBuildFile; fileRef = 20F694CE1805176800DEDB45 /* movieForwardSelected.png */; };
 		20F694D31805176800DEDB45 /* movieForwardSelected@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 20F694CF1805176800DEDB45 /* movieForwardSelected@2x.png */; };
+		4F1FABCB18072DD800849D06 /* movieEndFullscreen.png in Resources */ = {isa = PBXBuildFile; fileRef = 4F1FABC918072DD800849D06 /* movieEndFullscreen.png */; };
+		4F1FABCC18072DD800849D06 /* movieEndFullscreen@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4F1FABCA18072DD800849D06 /* movieEndFullscreen@2x.png */; };
 		4FE7646618045F5A00D91AF3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FE7646518045F5A00D91AF3 /* Foundation.framework */; };
 		4FE7646818045F5A00D91AF3 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FE7646718045F5A00D91AF3 /* CoreGraphics.framework */; };
 		4FE7646A18045F5A00D91AF3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FE7646918045F5A00D91AF3 /* UIKit.framework */; };
@@ -62,6 +64,8 @@
 		20F694CD1805176800DEDB45 /* movieBackwardSelected@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "movieBackwardSelected@2x.png"; sourceTree = "<group>"; };
 		20F694CE1805176800DEDB45 /* movieForwardSelected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = movieForwardSelected.png; sourceTree = "<group>"; };
 		20F694CF1805176800DEDB45 /* movieForwardSelected@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "movieForwardSelected@2x.png"; sourceTree = "<group>"; };
+		4F1FABC918072DD800849D06 /* movieEndFullscreen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = movieEndFullscreen.png; sourceTree = "<group>"; };
+		4F1FABCA18072DD800849D06 /* movieEndFullscreen@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "movieEndFullscreen@2x.png"; sourceTree = "<group>"; };
 		4FE7646218045F5A00D91AF3 /* ALMoviePlayerController.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ALMoviePlayerController.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4FE7646518045F5A00D91AF3 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		4FE7646718045F5A00D91AF3 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -232,6 +236,8 @@
 			children = (
 				4FE764AC18046B1800D91AF3 /* movieFullscreen.png */,
 				4FE764AD18046B1800D91AF3 /* movieFullscreen@2x.png */,
+				4F1FABC918072DD800849D06 /* movieEndFullscreen.png */,
+				4F1FABCA18072DD800849D06 /* movieEndFullscreen@2x.png */,
 				4FE764AE18046B1800D91AF3 /* moviePause.png */,
 				4FE764AF18046B1800D91AF3 /* moviePause@2x.png */,
 				4FE764B018046B1800D91AF3 /* moviePlay.png */,
@@ -328,6 +334,7 @@
 				20F694C918050C8800DEDB45 /* movieBackward@2x.png in Resources */,
 				4FE7647018045F5A00D91AF3 /* InfoPlist.strings in Resources */,
 				20F694D31805176800DEDB45 /* movieForwardSelected@2x.png in Resources */,
+				4F1FABCC18072DD800849D06 /* movieEndFullscreen@2x.png in Resources */,
 				4FE764B318046B1800D91AF3 /* movieFullscreen@2x.png in Resources */,
 				4FE764B518046B1800D91AF3 /* moviePause@2x.png in Resources */,
 				4FE764B218046B1800D91AF3 /* movieFullscreen.png in Resources */,
@@ -338,6 +345,7 @@
 				4FE764B618046B1800D91AF3 /* moviePlay.png in Resources */,
 				20F694D01805176800DEDB45 /* movieBackwardSelected.png in Resources */,
 				4FE764B718046B1800D91AF3 /* moviePlay@2x.png in Resources */,
+				4F1FABCB18072DD800849D06 /* movieEndFullscreen.png in Resources */,
 				4FE764A9180463AE00D91AF3 /* popeye.mp4 in Resources */,
 				20F694C818050C8800DEDB45 /* movieBackward.png in Resources */,
 			);
