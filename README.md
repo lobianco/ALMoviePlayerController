@@ -2,6 +2,16 @@
 
 ALMoviePlayerController is a drop-in replacement for MPMoviePlayerController that exposes the UI elements and allows for maximum customization.
 
+### Preview
+
+**ALMoviePlayerController on iPad, iOS 7.0**
+
+![Preview1](http://alobi.github.io/ALMoviePlayerController/screenshots/screenshot2.png)
+
+**ALMoviePlayerController on iPhone, iOS 6.1**
+
+![Preview2](http://alobi.github.io/ALMoviePlayerController/screenshots/screenshot1.png)
+
 ### Features
 
 * Drop-in replacement for ```MPMoviePlayerController```
