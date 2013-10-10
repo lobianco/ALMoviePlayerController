@@ -31,9 +31,223 @@
         <h1>
 <a name="almovieplayercontroller" class="anchor" href="#almovieplayercontroller"><span class="octicon octicon-link"></span></a>ALMoviePlayerController</h1>
 
-<p>A drop-in replacement for MPMoviePlayerController that exposes the UI elements and allows for maximum customization.</p>
+<p>ALMoviePlayerController is a drop-in replacement for MPMoviePlayerController that exposes the UI elements and allows for maximum customization.</p>
 
-<p>Readme coming soon. </p>
+<h3>
+<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h3>
+
+<ul>
+<li>Drop-in replacement for <code>MPMoviePlayerController</code>
+</li>
+<li>Many different customization options, or you can go with the stock Apple look</li>
+<li>Portrait and landscape support</li>
+<li>Universal (iPhone and iPad) support</li>
+<li>iOS 5.0 - iOS 7 support</li>
+<li>Lightweight, stable component with small memory footprint</li>
+</ul><h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>Installation is easy.</p>
+
+<h3>
+<a name="cocoapods" class="anchor" href="#cocoapods"><span class="octicon octicon-link"></span></a>Cocoapods</h3>
+
+<ol>
+<li>Add <code>pod 'ALMoviePlayerController', '~&gt;0.2.0'</code> to your Podfile</li>
+<li>
+<code>#import &lt;ALMoviePlayerController/ALMoviePlayerController.h&gt;</code> in your view of choice</li>
+</ol><h3>
+<a name="manually" class="anchor" href="#manually"><span class="octicon octicon-link"></span></a>Manually</h3>
+
+<ol>
+<li>
+<a href="https://github.com/alobi/ALMoviePlayerController/archive/master.zip">Download the ZIP</a> from Github and copy the ALMoviePlayerController directory to your project</li>
+<li>Link the <code>QuartzCore.framework</code> and <code>MediaPlayer.framework</code> library in your project's Build Phases</li>
+<li>
+<code>#import "ALMoviePlayerController.h"</code> in your view of choice</li>
+</ol><h3>
+<a name="tested-environments" class="anchor" href="#tested-environments"><span class="octicon octicon-link"></span></a>Tested Environments</h3>
+
+<p>ALMoviePlayerController has been tested to work on iOS 5.0, 5.1 and 6.0 (simulator), iOS 6.1 (device), and iOS 7.0 (device). ALMoviePlayerController requires that ARC be enabled.</p>
+
+<h2>
+<a name="example-usage" class="anchor" href="#example-usage"><span class="octicon octicon-link"></span></a>Example Usage</h2>
+
+<p>The process is as follows:</p>
+
+<ol>
+<li>Create an <code>ALMoviePlayerController</code> movie player and assign yourself as its delegate</li>
+<li>Create the <code>ALMoviePlayerControls</code> controls (and optionally customize)</li>
+<li>Assign the controls to the movie player</li>
+<li>Set the movie player's <code>contentURL</code>, and play the movie</li>
+<li>On device rotation, adjust movie player frame if it's not in fullscreen (when in fullscreen, rotation is handled automatically)</li>
+<li>Implement <code>ALMoviePlayerController</code> delegate methods </li>
+</ol><p><strong>In code:</strong></p>
+
+<div class="highlight highlight-objc"><pre><span class="c1">// create a movie player</span>
+<span class="n">ALMoviePlayerController</span> <span class="o">*</span><span class="n">moviePlayer</span> <span class="o">=</span> <span class="p">[[</span><span class="n">ALMoviePlayerController</span> <span class="n">alloc</span><span class="p">]</span> <span class="n">initWithFrame</span><span class="o">:</span><span class="n">self</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">frame</span><span class="p">];</span>
+<span class="n">moviePlayer</span><span class="p">.</span><span class="n">delegate</span> <span class="o">=</span> <span class="n">self</span><span class="p">;</span> <span class="c1">//IMPORTANT!</span>
+
+<span class="c1">// create the controls</span>
+<span class="n">ALMoviePlayerControls</span> <span class="o">*</span><span class="n">movieControls</span> <span class="o">=</span> <span class="p">[[</span><span class="n">ALMoviePlayerControls</span> <span class="n">alloc</span><span class="p">]</span> <span class="n">initWithMoviePlayer</span><span class="o">:</span><span class="n">moviePlayer</span>
+                                                                      <span class="nl">style:</span><span class="n">ALMoviePlayerControlsStyleDefault</span><span class="p">];</span>
+
+<span class="c1">// optionally customize the controls here...</span>
+<span class="cm">/* </span>
+<span class="cm">[movieControls setBarColor:[UIColor colorWithRed:195/255.0 green:29/255.0 blue:29/255.0 alpha:0.5]];</span>
+<span class="cm">[movieControls setTimeRemainingDecrements:YES];</span>
+<span class="cm">[movieControls setFadeDelay:2.0];</span>
+<span class="cm">[movieControls setBarHeight:100.f];</span>
+<span class="cm">[movieControls setSeekRate:2.f];</span>
+<span class="cm"> */</span>
+
+<span class="c1">// assign the controls to the movie player</span>
+<span class="p">[</span><span class="n">moviePlayer</span> <span class="n">setControls</span><span class="o">:</span><span class="n">movieControls</span><span class="p">];</span>
+
+<span class="c1">// add movie player to your view</span>
+<span class="p">[</span><span class="n">self</span><span class="p">.</span><span class="n">view</span> <span class="n">addSubview</span><span class="o">:</span><span class="n">moviePlayer</span><span class="p">.</span><span class="n">view</span><span class="p">];</span>
+
+<span class="c1">//set contentURL</span>
+<span class="p">[</span><span class="n">moviePlayer</span> <span class="n">setContentURL</span><span class="o">:</span><span class="p">[</span><span class="n">NSURL</span> <span class="n">URLWithString</span><span class="o">:</span><span class="s">@"http://archive.org/download/WaltDisneyCartoons-MickeyMouseMinnieMouseDonaldDuckGoofyAndPluto/WaltDisneyCartoons-MickeyMouseMinnieMouseDonaldDuckGoofyAndPluto-HawaiianHoliday1937-Video.mp4"</span><span class="p">]];</span>
+</pre></div>
+
+<p><strong>On rotation:</strong></p>
+
+<div class="highlight highlight-objc"><pre><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">self</span><span class="p">.</span><span class="n">moviePlayer</span><span class="p">.</span><span class="n">isFullscreen</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">[</span><span class="n">self</span><span class="p">.</span><span class="n">moviePlayer</span> <span class="n">setFrame</span><span class="o">:</span><span class="n">frame</span><span class="p">];</span>
+    <span class="c1">//"frame" is whatever the movie player's frame should be at that given moment</span>
+<span class="p">}</span>
+</pre></div>
+
+<p><strong>Note:</strong> you MUST use <code>[ALMoviePlayerController setFrame:]</code> to adjust frame, NOT <code>[ALMoviePlayerController.view setFrame:]</code></p>
+
+<h3>
+<a name="delegate-methods" class="anchor" href="#delegate-methods"><span class="octicon octicon-link"></span></a>Delegate methods</h3>
+
+<div class="highlight highlight-objc"><pre><span class="err">@</span><span class="n">required</span>
+<span class="o">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">moviePlayerWillMoveFromWindow</span><span class="p">;</span>
+</pre></div>
+
+<div class="highlight highlight-objc"><pre><span class="k">@optional</span>
+<span class="o">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">movieTimedOut</span><span class="p">;</span>
+</pre></div>
+
+<p><strong>Note:</strong> <code>moviePlayerWillMoveFromWindow</code> is required for fullscreen mode to work properly. It should be used to re-add the movie player to your view controller's view (because during the transition to fullscreen, it was moved to <code>[[UIApplication sharedApplication] keyWindow]</code>. </p>
+
+<p>Your code might look something like this:</p>
+
+<div class="highlight highlight-objc"><pre><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">[</span><span class="n">self</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">subviews</span> <span class="n">containsObject</span><span class="o">:</span><span class="n">self</span><span class="p">.</span><span class="n">moviePlayer</span><span class="p">.</span><span class="n">view</span><span class="p">])</span>
+    <span class="p">[</span><span class="n">self</span><span class="p">.</span><span class="n">view</span> <span class="n">addSubview</span><span class="o">:</span><span class="n">self</span><span class="p">.</span><span class="n">moviePlayer</span><span class="p">.</span><span class="n">view</span><span class="p">];</span>
+
+<span class="p">[</span><span class="n">self</span><span class="p">.</span><span class="n">moviePlayer</span> <span class="n">setFrame</span><span class="o">:</span><span class="n">frame</span><span class="p">];</span>
+</pre></div>
+
+<h3>
+<a name="controls-properties" class="anchor" href="#controls-properties"><span class="octicon octicon-link"></span></a>Controls Properties</h3>
+
+<p>ALMoviePlayerControls has the following editable properties:</p>
+
+<div class="highlight highlight-objc"><pre><span class="cm">/** </span>
+<span class="cm"> The style of the controls. Can be changed on the fly.</span>
+
+<span class="cm"> Default value is ALMoviePlayerControlsStyleDefault</span>
+<span class="cm"> */</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span> <span class="n">assign</span><span class="p">)</span> <span class="n">ALMoviePlayerControlsStyle</span> <span class="n">style</span><span class="p">;</span>
+
+<span class="cm">/** </span>
+<span class="cm"> The state of the controls.</span>
+<span class="cm"> */</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span> <span class="n">readonly</span><span class="p">)</span> <span class="n">ALMoviePlayerControlsState</span> <span class="n">state</span><span class="p">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> The color of the control bars. </span>
+
+<span class="cm"> Default value is black with a hint of transparency.</span>
+<span class="cm"> */</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span> <span class="n">strong</span><span class="p">)</span> <span class="n">UIColor</span> <span class="o">*</span><span class="n">barColor</span><span class="p">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> The height of the control bars. </span>
+
+<span class="cm"> Default value is 70.f for iOS7+ and 50.f for previous versions.</span>
+<span class="cm"> */</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span> <span class="n">assign</span><span class="p">)</span> <span class="n">CGFloat</span> <span class="n">barHeight</span><span class="p">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> The amount of time that the controls should stay on screen before automatically hiding.</span>
+
+<span class="cm"> Default value is 5 seconds.</span>
+<span class="cm"> */</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span> <span class="n">assign</span><span class="p">)</span> <span class="n">NSTimeInterval</span> <span class="n">fadeDelay</span><span class="p">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> The rate at which the movie should fastforward or rewind.</span>
+
+<span class="cm"> Default value is 3x.</span>
+<span class="cm"> */</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span> <span class="n">assign</span><span class="p">)</span> <span class="kt">float</span> <span class="n">seekRate</span><span class="p">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> Should the fullscreen image change when transitioning to/from fullscreen?</span>
+
+<span class="cm"> Default is YES.</span>
+<span class="cm"> */</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">)</span> <span class="kt">BOOL</span> <span class="n">adjustsFullscreenImage</span><span class="p">;</span>
+
+<span class="cm">/** </span>
+<span class="cm"> Should the time-remaining number decrement as the video plays?</span>
+
+<span class="cm"> Default value is NO.</span>
+<span class="cm"> */</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">)</span> <span class="kt">BOOL</span> <span class="n">timeRemainingDecrements</span><span class="p">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> Are the controls currently showing on screen?</span>
+<span class="cm"> */</span>
+<span class="k">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">,</span> <span class="n">readonly</span><span class="p">,</span> <span class="n">getter</span> <span class="o">=</span> <span class="n">isShowing</span><span class="p">)</span> <span class="kt">BOOL</span> <span class="n">showing</span><span class="p">;</span>
+</pre></div>
+
+<h3>
+<a name="controls-styles" class="anchor" href="#controls-styles"><span class="octicon octicon-link"></span></a>Controls Styles</h3>
+
+<div class="highlight highlight-objc"><pre><span class="k">typedef</span> <span class="k">enum</span> <span class="p">{</span>
+    <span class="cm">/** Controls will appear in a bottom bar */</span>
+    <span class="n">ALMoviePlayerControlsStyleEmbedded</span><span class="p">,</span>
+
+    <span class="cm">/** Controls will appear in a top bar and bottom bar */</span>
+    <span class="n">ALMoviePlayerControlsStyleFullscreen</span><span class="p">,</span>
+
+    <span class="cm">/** Controls will appear as ALMoviePlayerControlsStyleFullscreen when in fullscreen and ALMoviePlayerControlsStyleEmbedded at all other times */</span>
+    <span class="n">ALMoviePlayerControlsStyleDefault</span><span class="p">,</span>
+
+    <span class="cm">/** Controls will not appear */</span>
+    <span class="n">ALMoviePlayerControlsStyleNone</span><span class="p">,</span>
+
+<span class="p">}</span> <span class="n">ALMoviePlayerControlsStyle</span><span class="p">;</span>
+</pre></div>
+
+<h2>
+<a name="suggestions" class="anchor" href="#suggestions"><span class="octicon octicon-link"></span></a>Suggestions?</h2>
+
+<p>If you have any suggestions, let me know! If you find any bugs, please open a new issue.</p>
+
+<h2>
+<a name="contact-me" class="anchor" href="#contact-me"><span class="octicon octicon-link"></span></a>Contact Me</h2>
+
+<p>You can reach me anytime at the addresses below. If you use the library, feel free to give me a shoutout on Twitter to let me know how you like it. I'd love to hear your thoughts. </p>
+
+<p>Github: <a href="https://github.com/alobi">alobi</a> <br>
+Twitter: <a href="https://twitter.com/lobi4nco">@lobi4nco</a> <br>
+Email: <a href="mailto:anthony@lobian.co">anthony@lobian.co</a> </p>
+
+<h2>
+<a name="credits--license" class="anchor" href="#credits--license"><span class="octicon octicon-link"></span></a>Credits &amp; License</h2>
+
+<p>ALMoviePlayerController is developed and maintained by Anthony Lobianco (<a href="https://twitter.com/lobi4nco">@lobi4nco</a>). Licensed under the MIT License. Basically, I would appreciate attribution if you use it.</p>
+
+<p>Enjoy!</p>
+
+<p>(⌐■_■)</p>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/alobi">alobi</a></p>
