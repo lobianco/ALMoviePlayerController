@@ -8,6 +8,19 @@
 
 #import "ALMoviePlayerController.h"
 
+@implementation UIDevice (ALSystemVersion)
+
++ (float)iOSVersion {
+    static float version = 0.f;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        version = [[[UIDevice currentDevice] systemVersion] floatValue];
+    });
+    return version;
+}
+
+@end
+
 @implementation UIApplication (ALAppDimensions)
 
 + (CGSize)sizeInOrientation:(UIInterfaceOrientation)orientation {
@@ -16,7 +29,7 @@
     if (UIInterfaceOrientationIsLandscape(orientation)) {
         size = CGSizeMake(size.height, size.width);
     }
-    if (application.statusBarHidden == NO) {
+    if (!application.statusBarHidden && [UIDevice iOSVersion] < 7.0) {
         size.height -= MIN(application.statusBarFrame.size.width, application.statusBarFrame.size.height);
     }
     return size;
@@ -25,7 +38,6 @@
 @end
 
 static const CGFloat movieBackgroundPadding = 20.f; //if we don't pad the movie's background view, the edges will appear jagged when rotating
-static const CGFloat statusBarHeight = 20.f;
 static const NSTimeInterval fullscreenAnimationDuration = 0.3;
 
 @interface ALMoviePlayerController ()
@@ -77,6 +89,15 @@ static const NSTimeInterval fullscreenAnimationDuration = 0.3;
     return _movieFullscreen;
 }
 
+- (CGFloat)statusBarHeightInOrientation:(UIInterfaceOrientation)orientation {
+    //NSLog(@"%@", NSStringFromCGRect([UIApplication sharedApplication].statusBarFrame));
+    if ([UIDevice iOSVersion] >= 7.0)
+        return 0.f;
+    else if ([UIApplication sharedApplication].statusBarHidden)
+        return 0.f;
+    return 20.f;
+}
+
 # pragma mark - Setters
 
 - (void)setContentURL:(NSURL *)contentURL {
@@ -113,7 +134,9 @@ static const NSTimeInterval fullscreenAnimationDuration = 0.3;
         if (!keyWindow) {
             keyWindow = [[[UIApplication sharedApplication] windows] objectAtIndex:0];
         }
-        [self.movieBackgroundView setFrame:CGRectMake(-movieBackgroundPadding, -movieBackgroundPadding, keyWindow.bounds.size.width + movieBackgroundPadding*2, keyWindow.bounds.size.height + movieBackgroundPadding*2)];
+        if (CGRectEqualToRect(self.movieBackgroundView.frame, CGRectZero)) {
+            [self.movieBackgroundView setFrame:keyWindow.bounds];
+        }
         [keyWindow addSubview:self.movieBackgroundView];
         [UIView animateWithDuration:animated ? fullscreenAnimationDuration : 0.0 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
             self.movieBackgroundView.alpha = 1.f;
@@ -181,7 +204,7 @@ static const NSTimeInterval fullscreenAnimationDuration = 0.3;
             break;
         case UIInterfaceOrientationLandscapeLeft:
             angle = - M_PI_2;
-            backgroundFrame = CGRectMake(statusBarHeight - movieBackgroundPadding, -movieBackgroundPadding, windowSize.height + movieBackgroundPadding*2, windowSize.width + movieBackgroundPadding*2);
+            backgroundFrame = CGRectMake([self statusBarHeightInOrientation:orientation] - movieBackgroundPadding, -movieBackgroundPadding, windowSize.height + movieBackgroundPadding*2, windowSize.width + movieBackgroundPadding*2);
             movieFrame = CGRectMake(movieBackgroundPadding, movieBackgroundPadding, backgroundFrame.size.height - movieBackgroundPadding*2, backgroundFrame.size.width - movieBackgroundPadding*2);
             break;
         case UIInterfaceOrientationLandscapeRight:
@@ -192,7 +215,7 @@ static const NSTimeInterval fullscreenAnimationDuration = 0.3;
         case UIInterfaceOrientationPortrait:
         default:
             angle = 0.f;
-            backgroundFrame = CGRectMake(-movieBackgroundPadding, statusBarHeight - movieBackgroundPadding, windowSize.width + movieBackgroundPadding*2, windowSize.height + movieBackgroundPadding*2);
+            backgroundFrame = CGRectMake(-movieBackgroundPadding, [self statusBarHeightInOrientation:orientation] - movieBackgroundPadding, windowSize.width + movieBackgroundPadding*2, windowSize.height + movieBackgroundPadding*2);
             movieFrame = CGRectMake(movieBackgroundPadding, movieBackgroundPadding, backgroundFrame.size.width - movieBackgroundPadding*2, backgroundFrame.size.height - movieBackgroundPadding*2);
             break;
     }

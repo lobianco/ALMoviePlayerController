@@ -13,12 +13,6 @@
 #import <tgmath.h>
 #import <QuartzCore/QuartzCore.h>
 
-@interface ALMoviePlayerControlsBar : UIView
-
-@property (nonatomic, strong) UIColor *color;
-
-@end
-
 @implementation UIDevice (ALSystemVersion)
 
 + (float)iOSVersion {
@@ -29,6 +23,12 @@
     });
     return version;
 }
+
+@end
+
+@interface ALMoviePlayerControlsBar : UIView
+
+@property (nonatomic, strong) UIColor *color;
 
 @end
 
@@ -81,6 +81,10 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         _fadeDelay = 5.0;
         _timeRemainingDecrements = NO;
         _barColor = [UIColor blackColor];
+        
+        //in fullscreen mode, move controls away from bottom screen bezel. I think the iOS7 control center gestures interfere with the uibutton touch events. this will alleviate that a little (correct me if I'm wrong and/or adjust if necessary).
+        _barHeight = [UIDevice iOSVersion] >= 7.0 ? 70.f : 50.f;
+        
         _seekRate = 3.f;
         _state = ALMoviePlayerControlsStateIdle;
         
@@ -597,7 +601,6 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     CGFloat paddingBetweenButtons = self.frame.size.width <= iPhoneScreenPortraitWidth ? 10.f : 30.f;
     CGFloat paddingBetweenPlaybackButtons = self.frame.size.width <= iPhoneScreenPortraitWidth ? 20.f : 30.f;
     CGFloat paddingBetweenLabelsAndSlider = 10.f;
-    CGFloat barHeight = 50.f;
     CGFloat sliderHeight = 34.f; //default height
     CGFloat volumeHeight = 20.f;
     CGFloat volumeWidth = isIpad() ? 210.f : 120.f;
@@ -612,50 +615,47 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     CGFloat labelWidth = 40.f;
     
     if (self.style == ALMoviePlayerControlsStyleFullscreen || (self.style == ALMoviePlayerControlsStyleDefault && self.moviePlayer.isFullscreen)) {
-        //in fullscreen mode, move controls away from bottom screen bezel. I think the iOS7 control center gestures interfere with the uibutton touch events. this will alleviate that a little (adjust if necessary).
-        barHeight = [UIDevice iOSVersion] >= 7.0 ? 70.f : 50.f;
-        
         //top bar
-        self.topBar.frame = CGRectMake(0, 0, self.frame.size.width, barHeight);
-        self.timeElapsedLabel.frame = CGRectMake(paddingFromBezel, 0, labelWidth, barHeight);
-        self.timeRemainingLabel.frame = CGRectMake(self.topBar.frame.size.width - paddingFromBezel - labelWidth, 0, labelWidth, barHeight);
+        self.topBar.frame = CGRectMake(0, 0, self.frame.size.width, self.barHeight);
+        self.timeElapsedLabel.frame = CGRectMake(paddingFromBezel, 0, labelWidth, self.barHeight);
+        self.timeRemainingLabel.frame = CGRectMake(self.topBar.frame.size.width - paddingFromBezel - labelWidth, 0, labelWidth, self.barHeight);
         
         //bottom bar
-        self.bottomBar.frame = CGRectMake(0, self.frame.size.height - barHeight, self.frame.size.width, barHeight);
-        self.playPauseButton.frame = CGRectMake(self.bottomBar.frame.size.width/2 - playWidth/2, barHeight/2 - playHeight/2, playWidth, playHeight);
-        self.seekForwardButton.frame = CGRectMake(self.playPauseButton.frame.origin.x + self.playPauseButton.frame.size.width + paddingBetweenPlaybackButtons, barHeight/2 - seekHeight/2 + 1.f, seekWidth, seekHeight);
-        self.seekBackwardButton.frame = CGRectMake(self.playPauseButton.frame.origin.x - paddingBetweenPlaybackButtons - seekWidth, barHeight/2 - seekHeight/2 + 1.f, seekWidth, seekHeight);
+        self.bottomBar.frame = CGRectMake(0, self.frame.size.height - self.barHeight, self.frame.size.width, self.barHeight);
+        self.playPauseButton.frame = CGRectMake(self.bottomBar.frame.size.width/2 - playWidth/2, self.barHeight/2 - playHeight/2, playWidth, playHeight);
+        self.seekForwardButton.frame = CGRectMake(self.playPauseButton.frame.origin.x + self.playPauseButton.frame.size.width + paddingBetweenPlaybackButtons, self.barHeight/2 - seekHeight/2 + 1.f, seekWidth, seekHeight);
+        self.seekBackwardButton.frame = CGRectMake(self.playPauseButton.frame.origin.x - paddingBetweenPlaybackButtons - seekWidth, self.barHeight/2 - seekHeight/2 + 1.f, seekWidth, seekHeight);
         
         //hide volume view in iPhone's portrait orientation
         if (self.frame.size.width <= iPhoneScreenPortraitWidth) {
             self.volumeView.alpha = 0.f;
         } else {
             self.volumeView.alpha = 1.f;
-            self.volumeView.frame = CGRectMake(paddingFromBezel, barHeight/2 - volumeHeight/2, volumeWidth, volumeHeight);
+            self.volumeView.frame = CGRectMake(paddingFromBezel, self.barHeight/2 - volumeHeight/2, volumeWidth, volumeHeight);
         }
         
-        self.fullscreenButton.frame = CGRectMake(self.bottomBar.frame.size.width - paddingFromBezel - fullscreenWidth, barHeight/2 - fullscreenHeight/2, fullscreenWidth, fullscreenHeight);
-        self.airplayView.frame = CGRectMake(self.fullscreenButton.frame.origin.x - paddingBetweenButtons - airplayWidth, barHeight/2 - airplayHeight/2, airplayWidth, airplayHeight);
+        self.fullscreenButton.frame = CGRectMake(self.bottomBar.frame.size.width - paddingFromBezel - fullscreenWidth, self.barHeight/2 - fullscreenHeight/2, fullscreenWidth, fullscreenHeight);
+        self.airplayView.frame = CGRectMake(self.fullscreenButton.frame.origin.x - paddingBetweenButtons - airplayWidth, self.barHeight/2 - airplayHeight/2, airplayWidth, airplayHeight);
     }
     
     else if (self.style == ALMoviePlayerControlsStyleEmbedded || (self.style == ALMoviePlayerControlsStyleDefault && !self.moviePlayer.isFullscreen)) {
-        self.bottomBar.frame = CGRectMake(0, self.frame.size.height - barHeight, self.frame.size.width, barHeight);
+        self.bottomBar.frame = CGRectMake(0, self.frame.size.height - self.barHeight, self.frame.size.width, self.barHeight);
         
         //left side of bottom bar
-        self.playPauseButton.frame = CGRectMake(paddingFromBezel, barHeight/2 - playHeight/2, playWidth, playHeight);
-        self.timeElapsedLabel.frame = CGRectMake(self.playPauseButton.frame.origin.x + self.playPauseButton.frame.size.width + paddingBetweenButtons, 0, labelWidth, barHeight);
+        self.playPauseButton.frame = CGRectMake(paddingFromBezel, self.barHeight/2 - playHeight/2, playWidth, playHeight);
+        self.timeElapsedLabel.frame = CGRectMake(self.playPauseButton.frame.origin.x + self.playPauseButton.frame.size.width + paddingBetweenButtons, 0, labelWidth, self.barHeight);
         
         //right side of bottom bar
-        self.fullscreenButton.frame = CGRectMake(self.bottomBar.frame.size.width - paddingFromBezel - fullscreenWidth, barHeight/2 - fullscreenHeight/2, fullscreenWidth, fullscreenHeight);
-        self.airplayView.frame = CGRectMake(self.fullscreenButton.frame.origin.x - paddingBetweenButtons - airplayWidth, barHeight/2 - airplayHeight/2, airplayWidth, airplayHeight);
-        self.timeRemainingLabel.frame = CGRectMake(self.airplayView.frame.origin.x - paddingBetweenButtons - labelWidth, 0, labelWidth, barHeight);
+        self.fullscreenButton.frame = CGRectMake(self.bottomBar.frame.size.width - paddingFromBezel - fullscreenWidth, self.barHeight/2 - fullscreenHeight/2, fullscreenWidth, fullscreenHeight);
+        self.airplayView.frame = CGRectMake(self.fullscreenButton.frame.origin.x - paddingBetweenButtons - airplayWidth, self.barHeight/2 - airplayHeight/2, airplayWidth, airplayHeight);
+        self.timeRemainingLabel.frame = CGRectMake(self.airplayView.frame.origin.x - paddingBetweenButtons - labelWidth, 0, labelWidth, self.barHeight);
     }
     
     //duration slider
     CGFloat timeRemainingX = self.timeRemainingLabel.frame.origin.x;
     CGFloat timeElapsedX = self.timeElapsedLabel.frame.origin.x;
     CGFloat sliderWidth = ((timeRemainingX - paddingBetweenLabelsAndSlider) - (timeElapsedX + self.timeElapsedLabel.frame.size.width + paddingBetweenLabelsAndSlider));
-    self.durationSlider.frame = CGRectMake(timeElapsedX + self.timeElapsedLabel.frame.size.width + paddingBetweenLabelsAndSlider, barHeight/2 - sliderHeight/2, sliderWidth, sliderHeight);
+    self.durationSlider.frame = CGRectMake(timeElapsedX + self.timeElapsedLabel.frame.size.width + paddingBetweenLabelsAndSlider, self.barHeight/2 - sliderHeight/2, sliderWidth, sliderHeight);
     
     if (self.state == ALMoviePlayerControlsStateLoading) {
         [_activityBackgroundView setFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
