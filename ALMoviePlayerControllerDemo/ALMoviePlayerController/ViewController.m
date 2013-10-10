@@ -38,19 +38,25 @@
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Remote File" style:UIBarButtonItemStyleBordered target:self action:@selector(remoteFile)];
     self.navigationItem.rightBarButtonItem.enabled = NO;
     
+    //create a player
     self.moviePlayer = [[ALMoviePlayerController alloc] init];
     self.moviePlayer.view.alpha = 0.f;
     self.moviePlayer.delegate = self; //IMPORTANT!
     
-    ALMoviePlayerControls *movieControls = [[ALMoviePlayerControls alloc] initWithMoviePlayer:self.moviePlayer style:ALMoviePlayerControlsStyleDefault];
+    //create the controls
+    ALMoviePlayerControls *movieControls = [[ALMoviePlayerControls alloc] initWithMoviePlayer:self.moviePlayer style:ALMoviePlayerControlsStyleEmbedded];
+    [movieControls setBarColor:[UIColor colorWithRed:195/255.0 green:29/255.0 blue:29/255.0 alpha:0.5]];
     //[movieControls setTimeRemainingDecrements:YES];
     //[movieControls setFadeDelay:2.0];
-    //[movieControls setBarColor:[UIColor redColor]];
     //[movieControls setBarHeight:100.f];
     //[movieControls setSeekRate:2.f];
     
+    //assign controls
     [self.moviePlayer setControls:movieControls];
     [self.view addSubview:self.moviePlayer.view];
+    
+    //THEN set contentURL
+    [self.moviePlayer setContentURL:[NSURL URLWithString:@"http://archive.org/download/WaltDisneyCartoons-MickeyMouseMinnieMouseDonaldDuckGoofyAndPluto/WaltDisneyCartoons-MickeyMouseMinnieMouseDonaldDuckGoofyAndPluto-HawaiianHoliday1937-Video.mp4"]];
     
     //delay initial load so statusBarOrientation returns correct value
     double delayInSeconds = 0.3;

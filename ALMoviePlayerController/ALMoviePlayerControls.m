@@ -80,7 +80,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         _showing = NO;
         _fadeDelay = 5.0;
         _timeRemainingDecrements = NO;
-        _barColor = [UIColor blackColor];
+        _barColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
         
         //in fullscreen mode, move controls away from top status bar and bottom screen bezel. I think the iOS7 control center gestures interfere with the uibutton touch events. this will alleviate that a little (correct me if I'm wrong and/or adjust if necessary).
         _barHeight = [UIDevice iOSVersion] >= 7.0 ? 70.f : 50.f;
@@ -701,7 +701,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 
 - (void)drawRect:(CGRect)rect {
     CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextSetFillColorWithColor(context, [_color colorWithAlphaComponent:0.5].CGColor);
+    CGContextSetFillColorWithColor(context, [_color CGColor]);
     CGContextFillRect(context, rect);
 }
 
