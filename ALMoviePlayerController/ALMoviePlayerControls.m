@@ -179,7 +179,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     _playPauseButton = [[ALButton alloc] init];
     [_playPauseButton setImage:[UIImage imageNamed:@"moviePause.png"] forState:UIControlStateNormal];
     [_playPauseButton setImage:[UIImage imageNamed:@"moviePlay.png"] forState:UIControlStateSelected];
-    [_playPauseButton setSelected:YES];
+    [_playPauseButton setSelected:_moviePlayer.playbackState == MPMoviePlaybackStatePlaying ? NO : YES];
     [_playPauseButton addTarget:self action:@selector(playPausePressed:) forControlEvents:UIControlEventTouchUpInside];
     _playPauseButton.delegate = self;
     [_bottomBar addSubview:_playPauseButton];
