@@ -63,8 +63,7 @@ self.moviePlayer = [[ALMoviePlayerController alloc] initWithFrame:self.view.fram
 self.moviePlayer.delegate = self; //IMPORTANT!
     
 // create the controls
-ALMoviePlayerControls *movieControls = [[ALMoviePlayerControls alloc] initWithMoviePlayer:moviePlayer
-                                                                      style:ALMoviePlayerControlsStyleDefault];
+ALMoviePlayerControls *movieControls = [[ALMoviePlayerControls alloc] initWithMoviePlayer:self.moviePlayer style:ALMoviePlayerControlsStyleDefault];
 
 // optionally customize the controls here...
 /* 
