@@ -80,13 +80,6 @@ typedef enum {
  */
 @property (nonatomic, assign) float seekRate;
 
-/**
- Should the fullscreen image change when transitioning to/from fullscreen?
- 
- Default is YES.
- */
-@property (nonatomic) BOOL adjustsFullscreenImage;
-
 /** 
  Should the time-remaining number decrement as the video plays?
  
