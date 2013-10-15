@@ -38,7 +38,7 @@ Installation is easy.
 
 ### Tested Environments
 
-ALMoviePlayerController has been tested to work on iOS 5.0, 5.1 and 6.0 (simulator), iOS 6.1 (device), and iOS 7.0 (device). ALMoviePlayerController requires that ARC be enabled.
+ALMoviePlayerController has been tested to work on iOS 5.0, 5.1 and 6.0 (simulator), and iOS 6.1 and 7.0 (device). ALMoviePlayerController requires that ARC be enabled.
 
 ## Example Usage
 
