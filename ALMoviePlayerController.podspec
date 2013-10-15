@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 	s.name			= 'ALMoviePlayerController'
-	s.version		= '0.2.0'
+	s.version		= '0.3.0'
 	s.summary		= 'A drop-in replacement for MPMoviePlayerController that exposes the UI elements and allows for maximum customization.'
 	s.homepage		= 'https://github.com/alobi/ALMoviePlayerController'
 	s.author		= { 'Anthony Lobianco' => 'anthony@lobian.co' }
