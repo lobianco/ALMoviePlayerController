@@ -227,6 +227,8 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 - (void)resetViews {
     [self stopDurationTimer];
     [self nilDelegates];
+    [_activityBackgroundView removeFromSuperview];
+    [_activityIndicator removeFromSuperview];
     [_topBar removeFromSuperview];
     [_bottomBar removeFromSuperview];
 }
