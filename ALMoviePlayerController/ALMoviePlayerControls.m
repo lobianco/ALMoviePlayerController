@@ -237,7 +237,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     _fullscreenButton.delegate = nil;
     _seekForwardButton.delegate = nil;
     _seekBackwardButton.delegate = nil;
-    _scaleButton.delegate = self;
+    _scaleButton.delegate = nil;
 }
 
 # pragma mark - Setters
