@@ -1,3 +1,5 @@
+**Edit (January, 2016):** I've stopped maintaining this repo, but please feel free to fork it!
+
 # ALMoviePlayerController
 
 ALMoviePlayerController is a drop-in replacement for MPMoviePlayerController that exposes the UI elements and allows for maximum customization.
@@ -6,11 +8,11 @@ ALMoviePlayerController is a drop-in replacement for MPMoviePlayerController tha
 
 **ALMoviePlayerController on iPad, iOS 7.0**
 
-![Preview1](http://alobi.github.io/ALMoviePlayerController/screenshots/screenshot2.png)
+![Preview1](http://lobianco.github.io/ALMoviePlayerController/screenshots/screenshot2.png)
 
 **ALMoviePlayerController on iPhone, iOS 6.1**
 
-![Preview2](http://alobi.github.io/ALMoviePlayerController/screenshots/screenshot1.png)
+![Preview2](http://lobianco.github.io/ALMoviePlayerController/screenshots/screenshot1.png)
 
 ### Features
 
@@ -32,7 +34,7 @@ Installation is easy.
 
 ### Manually
 
-1. [Download the ZIP](https://github.com/alobi/ALMoviePlayerController/archive/master.zip) from Github and copy the ALMoviePlayerController directory to your project
+1. [Download the ZIP](https://github.com/lobianco/ALMoviePlayerController/archive/master.zip) from Github and copy the ALMoviePlayerController directory to your project
 2. Link the ```QuartzCore.framework``` and ```MediaPlayer.framework``` library in your project's Build Phases
 3. ```#import "ALMoviePlayerController.h"``` in your view of choice
 
@@ -205,13 +207,13 @@ If you have any suggestions, let me know! If you find any bugs, please open a ne
 
 You can reach me anytime at the addresses below. If you use the library, feel free to give me a shoutout on Twitter to let me know how you like it. I'd love to hear your thoughts. 
 
-Github: [alobi](https://github.com/alobi) <br>
-Twitter: [@lobi4nco](https://twitter.com/lobi4nco) <br>
+Github: [lobianco](https://github.com/lobianco) <br>
+Twitter: [@lobnco](https://twitter.com/lobnco) <br>
 Email: [anthony@lobian.co](mailto:anthony@lobian.co) 
 
 ## Credits & License
 
-ALMoviePlayerController is developed and maintained by Anthony Lobianco ([@lobi4nco](https://twitter.com/lobi4nco)). Licensed under the MIT License. Basically, I would appreciate attribution if you use it.
+ALMoviePlayerController is developed and maintained by Anthony Lobianco ([@lobnco](https://twitter.com/lobnco)). Licensed under the MIT License. Basically, I would appreciate attribution if you use it.
 
 Enjoy!
 
